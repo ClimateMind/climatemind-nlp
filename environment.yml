@@ -26,4 +26,5 @@ dependencies:
       - scipy==1.5.2
       - tensorflow==2.4.0
       - urllib3==1.25.9
+      - validators==0.18.2
 
