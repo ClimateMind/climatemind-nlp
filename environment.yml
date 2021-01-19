@@ -5,7 +5,7 @@ dependencies:
   - pip=20.2.2
   - python=3.8.5
   - pip:
-      - git+https://github.com/ClimateMind/climatemind-backend.git
+      - git+https://github.com/ClimateMind/climatemind-ontology-processing.git
       - apiclient==1.0.4
       - black==20.8b1
       - conda==4.3.16
