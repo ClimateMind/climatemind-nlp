@@ -1,0 +1,12 @@
+{
+    "host": "0.0.0.0",
+    "db": "postgresql",
+    "db_settings": {
+        "postgresql": {
+            "host": "",
+            "dbname": "",
+            "user": "",
+            "password": ""
+        }
+    }
+}
