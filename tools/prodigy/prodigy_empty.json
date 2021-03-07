@@ -1,4 +1,5 @@
 {
+    "feed_overlap": false,
     "host": "0.0.0.0",
     "db": "postgresql",
     "db_settings": {

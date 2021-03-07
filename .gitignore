@@ -142,4 +142,5 @@ prodigy-*.whl
 ProdigyLicenseKey.txt
 
 # This json contains some of our Azure secrets so becare about comitting it
-prodigy.json 
+prodigy.json
+prodigy_testing/
