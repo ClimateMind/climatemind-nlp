@@ -2,7 +2,6 @@ FROM python:stretch
 LABEL version="1.0"
 
 ENV PYTHONUNBUFFERED 1
-ENV PRODIGY_ALLOWED_SESSIONS anthony,sampath,shweta,mukut,nikita,vivek
 
 COPY *linux_x86_64.whl /root
 RUN pip install /root/prodigy*.whl
