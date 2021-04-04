@@ -18,5 +18,5 @@ def coref_resolution(sentences: List[str]) -> List[str]:
     
     return coref_sentences
 
-A simple test
-# print(coref_resolution(["My sister has a dog. My sister loves a dog.", "My sister has a dog. She loves him. "]))
+# A simple test
+# print(coref_resolution(["Tom is a smart boy. He know a lot of thing.", "My sister has a dog. She loves him. "]))
