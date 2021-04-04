@@ -136,3 +136,11 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Prodigy files
+prodigy-*.whl
+ProdigyLicenseKey.txt
+
+# This json contains some of our Azure secrets so becare about comitting it
+prodigy.json
+prodigy_testing/
