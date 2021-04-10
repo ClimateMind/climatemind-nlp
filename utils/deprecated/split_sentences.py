@@ -1,3 +1,7 @@
+# Usage: split_sentences.py <path/to/output/of/process/extracted/text/script> (input)
+#                           <path/to/master/json> (output)
+#                           <path/to/split/sentences/jsonl> (output)
+
 import sys
 import spacy
 import srsly  # to easily read/write JSONL etc.
