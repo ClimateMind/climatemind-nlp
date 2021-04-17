@@ -54,8 +54,6 @@ def main():
                         items = {"text" : text, "title" : title, "diffbot_tags": tags, "date": date, "author": author,
                                  "siteName": siteName, "unique_id": unique_id, "url": url, "doc_type": doc_type}
 
-                    # RRR: Doesnt this mean that if its tag only, we only care about the ones that have pocket tags?
-                    # RRR: Also test this works
                     if (args.tag_only):
                         if(pocket_tags and "effects" in pocket_tags):
                             text_list.append(items)

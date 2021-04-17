@@ -1,6 +1,5 @@
 # script to read in the pickled file of all the pocket articles' text extracted using DiffBot.
 # Then output as a JSON that is compatible for inputting into Protigy for text annotation.
-# RRR: Argparse this
 
 import pandas as pd
 import pickle
