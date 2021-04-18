@@ -1,3 +1,5 @@
+# Original Author: Kameron Rodrigues
+
 # Usage: split_sentences.py <path/to/output/of/process/extracted/text/script> (input)
 #                           <path/to/master/json> (output)
 #                           <path/to/split/sentences/jsonl> (output)

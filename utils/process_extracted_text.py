@@ -1,3 +1,5 @@
+# Original Author: Kameron Rodrigues
+
 # script to read in the pickled file of all the pocket articles' text extracted using DiffBot.
 # Then output as a JSON that is compatible for inputting into Prodigy for text annotation.
 import argparse
@@ -16,12 +18,23 @@ def main():
     diffbot_extract      = open(diffbot_extract_file, "rb")
     data                 = pickle.load(diffbot_extract)
 
-    # "all_pocket_tag_annotations.csv"
-    tags_file_path = args.tags_file_path
-
     # data[0]['objects'][0].keys()
     # 'date', 'sentiment', 'images', 'author', 'estimatedDate', 'publisherRegion', 'icon', 'diffbotUri', 'siteName',
     # 'type', 'title', 'tags', 'publisherCountry', 'humanLanguage', 'pageUrl', 'html', 'text'
+
+    # "all_pocket_tag_annotations.csv"
+    tags_file_path = args.tags_file_path
+
+    #read all pocket tag annotations csv file into pandas dataframe
+    tag_annotations = pd.read_csv(tags_file_path, sep = "\t")
+
+    annotations_df = tag_annotations[["pageURL","tags"]]
+    annotations_df.tags = annotations_df["tags"].apply(lambda x: x.strip('][').replace("'","").split(', '))
+
+    #resolve duplicates by merging them.
+    annotations_df = annotations_df.groupby(['pageURL']).agg(sum).reset_index()
+    unique_tag_annotations = annotations_df.copy()
+    unique_tag_annotations.tags = annotations_df['tags'].apply(lambda x: list(set(x)))
 
     text_list = []
 
@@ -47,19 +60,23 @@ def main():
                         pocket_tags = unique_tag_annotations.loc[unique_tag_annotations['pageURL'] == url , "tags"].tolist()[0]
 
                     if (pocket_tags):
-                        items = {"text" : text, "title" : title, "diffbot_tags": tags, "date": date, "author": author,\
-                                 "siteName": siteName, "unique_id": unique_id, "url": url, "doc_type": doc_type,\
+                        items = {"text" : text, "title" : title, "diffbot_tags": diffbot_tags, \
+                                 "date": date, "author": author, "siteName": siteName, \
+                                 "unique_id": unique_id, "url": url, "doc_type": doc_type,\
                                  "pocket_tags": ", ".join(pocket_tags)}
                     else:
-                        items = {"text" : text, "title" : title, "diffbot_tags": tags, "date": date, "author": author,
-                                 "siteName": siteName, "unique_id": unique_id, "url": url, "doc_type": doc_type}
+                        items = {"text" : text, "title" : title, "diffbot_tags": diffbot_tags, \
+                                 "date": date, "author": author, "siteName": siteName, \
+                                 "unique_id": unique_id, "url": url, "doc_type": doc_type}
 
+                    # example tag: effects
                     if (args.tag_only):
-                        if(pocket_tags and "effects" in pocket_tags):
+                        if(pocket_tags and args.tag_only in pocket_tags):
                             text_list.append(items)
 
-        except:
-            print(article.keys())
+        except Exception as e:
+            print("Error: ", e)
+            print("Article: ", article, "\n")
 
     with open(args.output_file_path, 'w') as f:
         for item in text_list:

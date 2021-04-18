@@ -1,4 +1,4 @@
-# Adapted from Mukut's ipynb
+# Adapted from Mukut Mukherjee's ipynb
 
 import argparse
 from os import path
