@@ -10,7 +10,7 @@ RUN python -m spacy download en_core_web_md
 RUN mkdir -p /root/.prodigy/
 COPY ProdigyLicenseKey.txt /root/.prodigy/
 COPY prodigy.json /root/.prodigy/prodigy.json
-COPY ./ClimateBERT_cause_effect_prediction_pos_sentences.jsonl /root/
+COPY ./200_sentences_cause_effect_rel_150421.jsonl /root/
 RUN pip install psycopg2
 
-ENTRYPOINT prodigy textcat.manual cm-label-eval ./root/ClimateBERT_cause_effect_prediction_pos_sentences.jsonl  --label cause_effect_relation
+ENTRYPOINT prodigy textcat.manual cm-label-eval ./root/200_sentences_cause_effect_rel_150421.jsonl  --label cause_effect_relation
