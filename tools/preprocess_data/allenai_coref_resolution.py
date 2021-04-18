@@ -1,1 +1,0 @@
-# Coref resolution using AllenAI's model: https://github.com/allenai/allennlp-models
