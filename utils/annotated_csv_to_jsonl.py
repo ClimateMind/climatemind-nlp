@@ -1,37 +1,39 @@
 #making jsonl file from csv of annotated sentences
 
-import json
+import argparse
 import pandas as pd
 import srsly
 import random
+from os import path
+
+def main():
+    data = pd.read_csv(args.input_file_path, sep = ",")
+
+    columns = list(data.columns)
+
+    output_file_path = args.input_file_path.replace(".csv", ".jsonl", 1)
+    randomized_output_file_path = path.join(path.dirname(output_file_path),
+                                            "reversed_" + path.basename(output_file_path)
+                                            )
+    json_data = []
+    for index, row in data.iterrows():
+            line_contents = {} # each dictionary holds all information of a single line
+
+            for column in columns:
+                    if column == "text":
+                            row[column] = row[column].replace('\n','')
+                    line_contents[column] = row[column]
+            json_data.append(line_contents)
+
+    #if want to randomize the list
+    json_data_shuffled = random.sample(json_data, len(json_data))
 
 
-#file_path = "sentences_for_NER_from_cause_effect_classifier_climateBERT_predictions_for_sentences_from_effect_tag_articles.csv"
-file_path = "15 April 2021 - cm_cause_effect_rel_download.45fa2a75-cc43-4236-a0e8-b922028c9ca1 - 200_sentences_cause_effect_rel_150421.csv"#"pocket_pred.csv"
+    srsly.write_jsonl(output_file_path,            json_data)
+    srsly.write_jsonl(randomized_output_file_path, json_data_shuffled)
 
-
-data = pd.read_csv(file_path, sep = ",")
-
-columns = list(data.columns)
-
-
-output_file_path = file_path.replace(".csv", ".jsonl",1)
-
-
-json_data = []
-
-for index, row in data.iterrows():
-	line_contents = {} #each dictionary holds all information of a single line
-	
-	for column in columns:
-		line_contents[column] = row[column]
-	json_data.append(line_contents)
-
-#if want to randomize the list
-json_data_shuffled = random.sample(json_data, len(json_data))
-
-
-srsly.write_jsonl(output_file_path, json_data)
-srsly.write_jsonl('randomized_'+output_file_path, json_data_shuffled)
-
-
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser("Making jsonl file from csv of annotated sentences")
+    parser.add_argument('--input_file_path',  help='Path to csv file (Required)', required=True)
+    args = parser.parse_args()
+    main()
