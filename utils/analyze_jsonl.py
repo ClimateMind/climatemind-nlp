@@ -6,8 +6,8 @@ import srsly
 import copy
 import csv
 
-#file_path = "KR_updated_annotations_team_task1.jsonl" 
-file_name = "rel_data_KR"
+#file_path = "entity_checkin_one_download.49863984-3905-4e3d-a059-4b2ef0004267.jsonl" 
+file_name = "entity_checkin_one_download.850cb48f-8027-4380-a497-fc0f31e64f48"
 file_path = file_name + ".jsonl"
 
 data = srsly.read_jsonl(file_path)
@@ -26,22 +26,24 @@ keep_lines = {}
 data_for_csv = []
 
 #columns = 
- #change_direction, type_for_entity, base_entity, measureable_aspect_or_state_that_changes, 
- #group_affected, location_associated, confidence_indicator, temporal_association, effect_size, 
+ #base,type_of,change_direction,aspect_changing,to_whom,effect_size,confidence,where,when,predicate 
  #text, original_text, source
 
+#spans
+#Concept_Member,Contributes_To
 
 empty_dict_entry = {
-	"change_direction": [],
-	"type": [],
-	"base_entity": [],
-	"measurable_aspect_or_state_that_changes": [],
-	"group_affected": [],
-	"location_associated": [],
-	"confidence_indicator": [],
-	"temporal_association": [],
+  "username": [],
+  "change_direction": [],
+	"type_of": [],
+	"base": [],
+	"aspect_changing": [],
+	"to_whom": [],
 	"effect_size": [],
-	"cause_effect_relation_predicate": [],
+	"confidence": [],  
+	"where": [],
+	"when": [],
+	"predicate": [],
 	"text": [],
 	"original_text": [],
 	"source": [],
@@ -50,21 +52,22 @@ empty_dict_entry = {
 	}
 
 csv_columns = [
-"change_direction", 
-"type", 
-"base_entity", 
-"measurable_aspect_or_state_that_changes", 
-"group_affected", 
-"location_associated", 
-"confidence_indicator", 
-"temporal_association",
- "effect_size",
- "cause_effect_relation_predicate",
- "text",
- "original_text",
- "source",
- "document_id",
- "sentence_id"
+	"username",
+  	"change_direction",
+	"type_of",
+  	"base",
+	"aspect_changing",
+	"to_whom",
+	"effect_size",
+	"confidence",  
+	"where",
+	"when",
+	"predicate",
+	"text",
+	"original_text",
+	"source",
+	"document_id",
+	"sentence_id"
 ]	
 
 csv_lines = []
@@ -75,7 +78,6 @@ csv_lines.append(csv_columns)
 
 #for each sentence entry
 for entry in data:
-
 	if "text" in entry:
 		text = entry["text"]
 	else: throw("NO 'text' field encountered! This field is necessary for the rest of the script to work! Please fix this and then run this script.")
@@ -104,6 +106,11 @@ for entry in data:
 	else: 
 		sentence_id = "sentence id missing!"
 
+	if "_session_id" in entry:
+		username = entry["_session_id"]
+	else: 
+		username = "_session_id missing!"
+
 
 	base_entity_dict = {}
 
@@ -113,7 +120,7 @@ for entry in data:
 				#check if the "child_span" has the "label" of "base_entity" and if does, then check if that child base_entity is in the base_entity_dict and if not then add that child base_entity
 				if "child_span" in relation:
 					if "label" in relation["child_span"]:
-						if relation["child_span"]["label"] == "base_entity":
+						if relation["child_span"]["label"] == "base":
 							#check if this base entity is in the base_entity_dict
 							child_span_start = relation["child_span"]["start"] #assumes "start" is present even though doesn't check for it! And assumes just 1 start. This could be improved by checking first for "start"
 							child_span_end = relation["child_span"]["end"] #assumes "end" is present even though doesn't check for it! And assumes just 1 end. This could be improved by checking first for "end"
@@ -122,12 +129,13 @@ for entry in data:
 
 							if dict_key not in base_entity_dict.keys(): #add it
 								base_entity_dict[dict_key] = copy.deepcopy(empty_dict_entry)
-								base_entity_dict[dict_key]["base_entity"].append(base_entity)
+								base_entity_dict[dict_key]["base"].append(base_entity)
 								base_entity_dict[dict_key]["text"].append(text)
 								base_entity_dict[dict_key]["original_text"].append(original_text)
 								base_entity_dict[dict_key]["source"].append(source)
 								base_entity_dict[dict_key]["document_id"].append(document_id)
 								base_entity_dict[dict_key]["sentence_id"].append(sentence_id)
+								base_entity_dict[dict_key]["username"].append(username)
 
 							
 							#now process that Concept_Members relation's "head" information and add it to it's associated base_entity information in the appropriate value of it's appropriate base_entity_dict key.
@@ -156,7 +164,6 @@ output_file_name = file_name + '_base_entity_export.csv'
 with open(output_file_name, 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerows(csv_lines)
-
 
 
 
