@@ -8,9 +8,11 @@ import csv
 from collections import defaultdict
 
 #file_path = "entity_checkin_one_download.49863984-3905-4e3d-a059-4b2ef0004267.jsonl"
-file_name = "test-team-answers-bases-checkin-one"
+file_name = "entity_checkin_one_download_6May21"
 file_path = "C://Users//buchh//OneDrive/Desktop//"+file_name+".jsonl"
-file_name_answers = "model-answers-bases-entity-one-checkin"
+#file_name_answers = "model-answers-bases-entity-one-checkin"
+file_name_answers = "ElleGettingAnswers_answers"
+#file_path_answers = "C://Users//buchh//OneDrive/Desktop//"+file_name_answers+".jsonl"
 file_path_answers = "C://Users//buchh//OneDrive/Desktop//"+file_name_answers+".jsonl"
 #file_name = "entity_checkin_one_download.850cb48f-8027-4380-a497-fc0f31e64f48"
 #file_path = file_name + ".jsonl"
@@ -104,39 +106,63 @@ def create_dict(datasource, dict_name):
             username = entry["_session_id"]
         else:
             username = ""
+        username = username.replace("entity_checkin_one-", "")
 
-        for relation in entry["spans"]:
-            if "label" in relation:
-                if relation["label"] == "base":
-                    child_span_start = relation["start"]
-                    child_span_end = relation["end"]
-                    dict_key = str(child_span_start) + ":" + str(child_span_end)
-                    #print(dict_key)
-                    username = username.replace("entity_checkin_one-", "")
-                    base_entity = text[child_span_start:child_span_end]
+        if entry['answer'] == "accept":
+            for relation in entry["spans"]:
+                if "label" in relation:
+                    if relation["label"] == "base":
+                        child_span_start = relation["start"]
+                        child_span_end = relation["end"]
+                        dict_key = str(child_span_start) + ":" + str(child_span_end)
+                        base_entity = text[child_span_start:child_span_end]
 
-                    if username in dict_name:
-                        old_val = dict_name[username]
-                        old_val.append({"dict_key": dict_key,
-                                        "base": base_entity,
+                        if username in dict_name:
+                            old_val = dict_name[username]
+                            old_val.append({"dict_key": dict_key,
+                                            "base": base_entity,
+                                            "text": text,
+                                            "original_text": original_text,
+                                            "source": source,
+                                            "document_id": document_id,
+                                            "sentence_id": sentence_id,
+                                            "username": username
+                                            })
+                            dict_name[username] = old_val
+                        else:
+                            dict_name[username] = [{"dict_key": dict_key,
+                                                    "base": base_entity,
+                                                    "text": text,
+                                                    "original_text": original_text,
+                                                    "source": source,
+                                                    "document_id": document_id,
+                                                    "sentence_id": sentence_id,
+                                                    "username": username
+                                                  }]
+        else:
+            if username in dict_name:
+                old_val = dict_name[username]
+                old_val.append({"dict_key": "",
+                                "base": "No base",
+                                "text": text,
+                                "original_text": original_text,
+                                "source": source,
+                                "document_id": document_id,
+                                "sentence_id": sentence_id,
+                                "username": username
+                                })
+                dict_name[username] = old_val
+            else:
+                dict_name[username] = [{"dict_key": "",
+                                        "base": "No base",
                                         "text": text,
                                         "original_text": original_text,
                                         "source": source,
                                         "document_id": document_id,
                                         "sentence_id": sentence_id,
                                         "username": username
-                                        })
-                        dict_name[username] = old_val
-                    else:
-                        dict_name[username] = [{"dict_key": dict_key,
-                                                "base": base_entity,
-                                                "text": text,
-                                                "original_text": original_text,
-                                                "source": source,
-                                                "document_id": document_id,
-                                                "sentence_id": sentence_id,
-                                                "username": username
-                                                }]
+                                        }]
+
 
 def get_answer_dict(datasource, dict_name):
     for entry in datasource:
@@ -158,8 +184,17 @@ def get_res():
     for x in base_entity_dict:
         key_tmp = base_entity_dict[x]
         for u in key_tmp:
-            ans = base_entity_dict_answers[u['text']]
-            if u['base'] in ans:
+            try:
+                ans = base_entity_dict_answers[u['text']]
+            except KeyError as k:
+                ans = []
+            if not ans and u['base'] == "No base":
+                u['correct'] = True
+                u['correct_base'] = u['base']
+            elif not ans and u['base']:
+                u['correct'] = False
+                u['correct_base'] = "No base"
+            elif u['base'] in ans:
                 u['correct'] = True
                 u['correct_base'] = u['base']
             else:
@@ -171,6 +206,7 @@ def write_file():
     csv_lines = []
     output_file_name = file_name + '_base_entity_export.csv'
     csv_line = []
+    user_check = []
     csv_line.append(csv_columns_sub)
     for x in base_entity_dict:
         for u in base_entity_dict[x]:
