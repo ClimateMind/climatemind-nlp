@@ -1,82 +1,28 @@
 #analyze jsonl file form cause_effect sentence entity labeling (semantic role labeling)
 
-#import jsonl file
 import srsly
-#import itertools
-import copy
 import csv
-from collections import defaultdict
 
-#file_path = "entity_checkin_one_download.49863984-3905-4e3d-a059-4b2ef0004267.jsonl"
 file_name = "entity_checkin_one_download_6May21"
 file_path = "C://Users//buchh//OneDrive/Desktop//"+file_name+".jsonl"
-#file_name_answers = "model-answers-bases-entity-one-checkin"
 file_name_answers = "ElleGettingAnswers_answers"
-#file_path_answers = "C://Users//buchh//OneDrive/Desktop//"+file_name_answers+".jsonl"
 file_path_answers = "C://Users//buchh//OneDrive/Desktop//"+file_name_answers+".jsonl"
-#file_name = "entity_checkin_one_download.850cb48f-8027-4380-a497-fc0f31e64f48"
-#file_path = file_name + ".jsonl"
 
 data = srsly.read_jsonl(file_path)
 data_answers = srsly.read_jsonl(file_path_answers)
 
-keep_lines = {}
-data_for_csv = []
-
-empty_dict_entry = {
-    "username": [],
-    "change_direction": [],
-    "type_of": [],
-    "base": [],
-    "correct_base": [],
-    "aspect_changing": [],
-    "to_whom": [],
-    "effect_size": [],
-    "confidence": [],
-    "where": [],
-    "when": [],
-    "predicate": [],
-    "text": [],
-    "original_text": [],
-    "source": [],
-    "document_id": [],
-    "sentence_id": [],
-    "correct": []
-}
-
-csv_columns = [
-    "username",
-    "change_direction",
-    "type_of",
-    "base",
-    "correct_base",
-    "aspect_changing",
-    "to_whom",
-    "effect_size",
-    "confidence",
-    "where",
-    "when",
-    "predicate",
-    "text",
-    "original_text",
-    "source",
-    "document_id",
-    "sentence_id",
-    "correct"
-]
-
 csv_columns_sub = [
     "username",
     "text",
-    "base",
+    "user_base",
     "correct_base",
-    "correct"
+    "result"
 ]
 
-csv_lines = []
 base_entity_dict = {}
 base_entity_dict_answers = {}
-#csv_lines.append(csv_columns)
+all_users = []
+
 
 def create_dict(datasource, dict_name):
     for entry in datasource:
@@ -108,6 +54,9 @@ def create_dict(datasource, dict_name):
             username = ""
         username = username.replace("entity_checkin_one-", "")
 
+        if username not in all_users:
+            all_users.append(username)
+
         if entry['answer'] == "accept":
             for relation in entry["spans"]:
                 if "label" in relation:
@@ -119,47 +68,27 @@ def create_dict(datasource, dict_name):
 
                         if username in dict_name:
                             old_val = dict_name[username]
-                            old_val.append({"dict_key": dict_key,
-                                            "base": base_entity,
+                            old_val.append({"base": base_entity,
                                             "text": text,
-                                            "original_text": original_text,
-                                            "source": source,
-                                            "document_id": document_id,
-                                            "sentence_id": sentence_id,
                                             "username": username
                                             })
                             dict_name[username] = old_val
                         else:
-                            dict_name[username] = [{"dict_key": dict_key,
-                                                    "base": base_entity,
+                            dict_name[username] = [{"base": base_entity,
                                                     "text": text,
-                                                    "original_text": original_text,
-                                                    "source": source,
-                                                    "document_id": document_id,
-                                                    "sentence_id": sentence_id,
                                                     "username": username
-                                                  }]
+                                                    }]
         else:
             if username in dict_name:
                 old_val = dict_name[username]
-                old_val.append({"dict_key": "",
-                                "base": "No base",
+                old_val.append({"base": "No base",
                                 "text": text,
-                                "original_text": original_text,
-                                "source": source,
-                                "document_id": document_id,
-                                "sentence_id": sentence_id,
                                 "username": username
                                 })
                 dict_name[username] = old_val
             else:
-                dict_name[username] = [{"dict_key": "",
-                                        "base": "No base",
+                dict_name[username] = [{"base": "No base",
                                         "text": text,
-                                        "original_text": original_text,
-                                        "source": source,
-                                        "document_id": document_id,
-                                        "sentence_id": sentence_id,
                                         "username": username
                                         }]
 
@@ -180,6 +109,8 @@ def get_answer_dict(datasource, dict_name):
                         dict_name[text] = dict_name[text] + base_entity
 
 
+"""
+# old implementation with only found, incorrect, and partial as results
 def get_res():
     for x in base_entity_dict:
         key_tmp = base_entity_dict[x]
@@ -188,46 +119,123 @@ def get_res():
                 ans = base_entity_dict_answers[u['text']]
             except KeyError as k:
                 ans = []
-            if not ans and u['base'] == "No base":
-                u['correct'] = True
+
+            if u['base'] in ans:
+                u['correct'] = "found"
                 u['correct_base'] = u['base']
-            elif not ans and u['base']:
-                u['correct'] = False
+            elif not ans and u['base'] == "No base":
+                u['correct'] = "found"
+                u['correct_base'] = u['base']
+            elif (not ans and u['base']) or (ans and not u['base']) or (ans and u['base'] == "No base"):
+                u['correct'] = "incorrect"
                 u['correct_base'] = "No base"
-            elif u['base'] in ans:
-                u['correct'] = True
-                u['correct_base'] = u['base']
-            else:
-                u['correct'] = False
+            elif len(u['base'].split(" ")) > 1:
+                for r in u['base'].split(" "):
+                    for p in ans:
+                        if p == r:
+                            u['correct'] = "partial"
+                            u['correct_base'] = p
+                        if ('correct' or 'correct_base') not in u:
+                            u['correct'] = "incorrect"
+                            u['correct_base'] = "---"
+            elif u['base'] not in ans:
+                u['correct'] = "incorrect"
                 u['correct_base'] = "---"
+"""
 
 
-def write_file():
-    csv_lines = []
-    output_file_name = file_name + '_base_entity_export.csv'
-    csv_line = []
-    user_check = []
-    csv_line.append(csv_columns_sub)
+def get_tmp_dict(user):
+    tmp_dict = {}
     for x in base_entity_dict:
-        for u in base_entity_dict[x]:
-            #line = "{}, {}, {}, {}, {}".format(u['username'], u['text'], u['base'], u['correct_base'], u['correct'])
-            tmp_line = []
-            tmp_line.append(u['username'])
-            tmp_line.append(u['text'])
-            tmp_line.append(u['base'])
-            tmp_line.append(u['correct_base'])
-            tmp_line.append(u['correct'])
-            csv_line.append(tmp_line)
-    csv_lines = csv_line + csv_lines
+        for y in base_entity_dict[x]:
+            if y['username'] == user and y['text'] in base_entity_dict_answers:
+                if y['text'] in tmp_dict:
+                    updated_base = tmp_dict[y['text']] + [y['base']]
+                    tmp_dict[y['text']] = updated_base
+                else:
+                    tmp_dict[y['text']] = [y['base']]
+
+    #print("=====================")
+    #print(user)
+    #print(len(tmp_dict))
+    #print("=====================")
+    return tmp_dict
+
+
+# final implementation with found, incorrect, missing, partial, and not scored as result
+def get_res2():
+    output_file_name = file_name + '_base_entity_export.csv'
+    tmp_line = []
+    tmp_line.append(csv_columns_sub)
+    for x in all_users:
+        #x = "Himesh"
+        tmp_dict = get_tmp_dict(x)
+        if len(tmp_dict) > 0:
+            all_sent = list(base_entity_dict_answers.keys())
+            for t in tmp_dict:
+                tmp_right_ans = []
+                tmp_user_ans = []
+                all_sent.remove(t)
+                user_ans = tmp_dict[t]
+                right_ans = base_entity_dict_answers[t]
+                #print(t)
+                #print(user_ans)
+                #print(right_ans)
+                tmp_user_ans = tmp_user_ans + user_ans
+                tmp_right_ans = tmp_right_ans + right_ans
+                for a in user_ans:
+                    if a in tmp_right_ans:
+                        #print("found: " + a)
+                        line_arr = [x, t, a, a, "found"]
+                        tmp_line.append(line_arr)
+                        tmp_right_ans.remove(a)
+                        tmp_user_ans.remove(a)
+                    elif len(a.split(" ")) > 1:
+                        strings_with_substring = [string for string in tmp_right_ans if a in string]
+                        #print(strings_with_substring)
+                        if strings_with_substring:
+                            #print("partial: " + a)
+                            line_arr = [x, t, a, strings_with_substring[0], "partial"]
+                            tmp_line.append(line_arr)
+                            tmp_right_ans.remove(strings_with_substring[0])
+                            tmp_user_ans.remove(a)
+                        else:
+                            for a1 in a.split(" "):
+                                if a1 in tmp_right_ans:
+                                    #print("partial: " + a)
+                                    line_arr = [x, t, a, a1, "partial"]
+                                    tmp_line.append(line_arr)
+                                    tmp_right_ans.remove(a1)
+                                    tmp_user_ans.remove(a)
+                    else:
+                        #print("incorrect: " + a)
+                        line_arr = [x, t, a, "---", "incorrect"]
+                        tmp_line.append(line_arr)
+                        tmp_user_ans.remove(a)
+
+                if tmp_right_ans:
+                    for r1 in tmp_right_ans:
+                        #print("missing: " + r1)
+                        line_arr = [x, t, "---", r1, "missing"]
+                        tmp_line.append(line_arr)
+
+                #print()
+
+            if all_sent:
+                for s in all_sent:
+                    #print("not scored: " + s + ": " + ", ".join(base_entity_dict_answers[s]))
+                    line_arr = [x, s, "---", base_entity_dict_answers[s], "not scored"]
+                    tmp_line.append(line_arr)
+
     with open(output_file_name, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerows(csv_lines)
+        writer.writerows(tmp_line)
 
 
 create_dict(data, base_entity_dict)
 get_answer_dict(data_answers, base_entity_dict_answers)
-get_res()
-write_file()
+#get_res()
+get_res2()
 print("Done!")
 
 
