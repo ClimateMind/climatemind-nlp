@@ -1,9 +1,9 @@
 import srsly
 import json
 
-file_name = "entity_checkin_one_download_6May21"
-file_path = "C://Users//buchh//OneDrive/Desktop//"+file_name+".jsonl"
-user = "ElleGettingAnswers"
+file_name = "checkin2_base_typeof"
+file_path = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name+".jsonl"
+user = "answers"
 data = srsly.read_jsonl(file_path)
 
 
@@ -12,7 +12,7 @@ def get_answers(username):
     newfilename = username + "_answers.jsonl"
     f = open(newfilename, "w")
     for entry in data:
-        user_file = entry["_session_id"].replace("entity_checkin_one-", "")
+        user_file = entry["_session_id"].replace("checkin_two_blank_bases_typeof-", "")
         if user_file == username:
             if entry['answer'] == "accept":
                 checkuser.append("Username found: " + username)

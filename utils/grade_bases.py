@@ -3,25 +3,29 @@
 import srsly
 import csv
 
-file_name = "entity_checkin_one_download_6May21"
-file_path = "C://Users//buchh//OneDrive/Desktop//"+file_name+".jsonl"
-file_name_answers = "ElleGettingAnswers_answers"
-file_path_answers = "C://Users//buchh//OneDrive/Desktop//"+file_name_answers+".jsonl"
+file_name = "checkin_two"
+file_path = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name+".jsonl"
+file_name_answers = "answers_answers"
+file_path_answers = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name_answers+".jsonl"
 
 data = srsly.read_jsonl(file_path)
 data_answers = srsly.read_jsonl(file_path_answers)
 
 csv_columns_sub = [
-    "username",
+    "user",
     "text",
-    "user_base",
-    "correct_base",
-    "result"
+    "entity result",
+    "priority status",
+    "entity label",
+    "user word(s)",
+    "correct word(s)"
 ]
 
 base_entity_dict = {}
 base_entity_dict_answers = {}
 all_users = []
+tmp_line = []
+tmp_line.append(csv_columns_sub)
 
 
 def create_dict(datasource, dict_name):
@@ -32,27 +36,11 @@ def create_dict(datasource, dict_name):
             text = ""
             throw("NO 'text' field encountered! This field is necessary for the rest of the script to work! Please fix this and then run this script.")
 
-        if "original_text" in entry:
-            original_text = entry["orig_text"]
-        else:
-            original_text = ""
-        if "source" in entry:
-            source = entry["source"]
-        else:
-            source = ""
-        if "document_id" in entry:
-            document_id = entry["document_id"]
-        else:
-            document_id = ""
-        if "sentence_id" in entry:
-            sentence_id = entry["sentence_id"]
-        else:
-            sentence_id = ""
         if "_session_id" in entry:
             username = entry["_session_id"]
         else:
             username = ""
-        username = username.replace("entity_checkin_one-", "")
+        username = username.replace("checkin_two_blank_bases_typeof-", "")
 
         if username not in all_users:
             all_users.append(username)
@@ -60,36 +48,46 @@ def create_dict(datasource, dict_name):
         if entry['answer'] == "accept":
             for relation in entry["spans"]:
                 if "label" in relation:
+                    child_span_start = relation["start"]
+                    child_span_end = relation["end"]
+                    dict_key = str(child_span_start) + ":" + str(child_span_end)
                     if relation["label"] == "base":
-                        child_span_start = relation["start"]
-                        child_span_end = relation["end"]
-                        dict_key = str(child_span_start) + ":" + str(child_span_end)
                         base_entity = text[child_span_start:child_span_end]
+                    else:
+                        base_entity = ""
+                    if relation["label"] == "type_of":
+                        type_of = text[child_span_start:child_span_end]
+                    else:
+                        type_of = ""
 
-                        if username in dict_name:
-                            old_val = dict_name[username]
-                            old_val.append({"base": base_entity,
-                                            "text": text,
-                                            "username": username
-                                            })
-                            dict_name[username] = old_val
-                        else:
-                            dict_name[username] = [{"base": base_entity,
-                                                    "text": text,
-                                                    "username": username
-                                                    }]
+                    if username in dict_name:
+                        old_val = dict_name[username]
+                        old_val.append({"base": base_entity,
+                                        "text": text,
+                                        "username": username,
+                                        "typeOf": type_of
+                                        })
+                        dict_name[username] = old_val
+                    else:
+                        dict_name[username] = [{"base": base_entity,
+                                                "text": text,
+                                                "username": username,
+                                                "typeOf": type_of
+                                                }]
         else:
             if username in dict_name:
                 old_val = dict_name[username]
                 old_val.append({"base": "No base",
                                 "text": text,
-                                "username": username
+                                "username": username,
+                                "typeOf": "No type_of"
                                 })
                 dict_name[username] = old_val
             else:
                 dict_name[username] = [{"base": "No base",
                                         "text": text,
-                                        "username": username
+                                        "username": username,
+                                        "typeOf": "No type_of"
                                         }]
 
 
@@ -98,50 +96,25 @@ def get_answer_dict(datasource, dict_name):
         text = entry["text"]
         for relation in entry["spans"]:
             if "label" in relation:
+                child_span_start = relation["start"]
+                child_span_end = relation["end"]
+                dict_key = str(child_span_start) + ":" + str(child_span_end)
+
                 if relation["label"] == "base":
-                    child_span_start = relation["start"]
-                    child_span_end = relation["end"]
-                    dict_key = str(child_span_start) + ":" + str(child_span_end)
                     base_entity = [text[child_span_start:child_span_end]]
-                    if text not in dict_name:
-                        dict_name[text] = base_entity
-                    else:
-                        dict_name[text] = dict_name[text] + base_entity
-
-
-"""
-# old implementation with only found, incorrect, and partial as results
-def get_res():
-    for x in base_entity_dict:
-        key_tmp = base_entity_dict[x]
-        for u in key_tmp:
-            try:
-                ans = base_entity_dict_answers[u['text']]
-            except KeyError as k:
-                ans = []
-
-            if u['base'] in ans:
-                u['correct'] = "found"
-                u['correct_base'] = u['base']
-            elif not ans and u['base'] == "No base":
-                u['correct'] = "found"
-                u['correct_base'] = u['base']
-            elif (not ans and u['base']) or (ans and not u['base']) or (ans and u['base'] == "No base"):
-                u['correct'] = "incorrect"
-                u['correct_base'] = "No base"
-            elif len(u['base'].split(" ")) > 1:
-                for r in u['base'].split(" "):
-                    for p in ans:
-                        if p == r:
-                            u['correct'] = "partial"
-                            u['correct_base'] = p
-                        if ('correct' or 'correct_base') not in u:
-                            u['correct'] = "incorrect"
-                            u['correct_base'] = "---"
-            elif u['base'] not in ans:
-                u['correct'] = "incorrect"
-                u['correct_base'] = "---"
-"""
+                else:
+                    base_entity = []
+                if relation["label"] == "type_of":
+                    typeOf_entity = [text[child_span_start:child_span_end]]
+                else:
+                    typeOf_entity = []
+                if text not in dict_name:
+                    dict_name[text] = {'base': base_entity, 'typeOf': typeOf_entity}
+                else:
+                    updated_base = dict_name[text]['base'] + base_entity
+                    updated_typeOf = dict_name[text]['typeOf'] + typeOf_entity
+                    dict_name[text]['base'] = updated_base
+                    dict_name[text]['typeOf'] = updated_typeOf
 
 
 def get_tmp_dict(user):
@@ -150,10 +123,14 @@ def get_tmp_dict(user):
         for y in base_entity_dict[x]:
             if y['username'] == user and y['text'] in base_entity_dict_answers:
                 if y['text'] in tmp_dict:
-                    updated_base = tmp_dict[y['text']] + [y['base']]
-                    tmp_dict[y['text']] = updated_base
+                    if y['base']:
+                        updated_base = tmp_dict[y['text']]['base'] + [y['base']]
+                        tmp_dict[y['text']]['base'] = updated_base
+                    if y['typeOf']:
+                        updated_typeOf = tmp_dict[y['text']]['typeOf'] + [y['typeOf']]
+                        tmp_dict[y['text']]['typeOf'] = updated_typeOf
                 else:
-                    tmp_dict[y['text']] = [y['base']]
+                    tmp_dict[y['text']] = {'base': [y['base']], 'typeOf': [y['typeOf']]}
 
     #print("=====================")
     #print(user)
@@ -162,22 +139,19 @@ def get_tmp_dict(user):
     return tmp_dict
 
 
-# final implementation with found, incorrect, missing, partial, and not scored as result
-def get_res2():
-    output_file_name = file_name + '_base_entity_export.csv'
-    tmp_line = []
-    tmp_line.append(csv_columns_sub)
-    for x in all_users:
-        #x = "Himesh"
-        tmp_dict = get_tmp_dict(x)
-        if len(tmp_dict) > 0:
-            all_sent = list(base_entity_dict_answers.keys())
-            for t in tmp_dict:
-                tmp_right_ans = []
-                tmp_user_ans = []
-                all_sent.remove(t)
-                user_ans = tmp_dict[t]
-                right_ans = base_entity_dict_answers[t]
+def get_res(entity, user, status):
+    #x = "Himesh"
+    tmp_dict = get_tmp_dict(user)
+    if len(tmp_dict) > 0:
+        all_sent = list(base_entity_dict_answers.keys())
+        for t in tmp_dict:
+            partial = False
+            tmp_right_ans = []
+            tmp_user_ans = []
+            all_sent.remove(t)
+            user_ans = [i for i in tmp_dict[t][entity] if i]
+            right_ans = base_entity_dict_answers[t][entity]
+            if right_ans:
                 #print(t)
                 #print(user_ans)
                 #print(right_ans)
@@ -186,7 +160,7 @@ def get_res2():
                 for a in user_ans:
                     if a in tmp_right_ans:
                         #print("found: " + a)
-                        line_arr = [x, t, a, a, "found"]
+                        line_arr = [user, t, "found", status, entity, a, a]
                         tmp_line.append(line_arr)
                         tmp_right_ans.remove(a)
                         tmp_user_ans.remove(a)
@@ -195,48 +169,65 @@ def get_res2():
                         #print(strings_with_substring)
                         if strings_with_substring:
                             #print("partial: " + a)
-                            line_arr = [x, t, a, strings_with_substring[0], "partial"]
+                            line_arr = [user, t, "partial", status, entity, a, strings_with_substring[0]]
                             tmp_line.append(line_arr)
                             tmp_right_ans.remove(strings_with_substring[0])
                             tmp_user_ans.remove(a)
                         else:
                             for a1 in a.split(" "):
                                 if a1 in tmp_right_ans:
+                                    #print(a1)
                                     #print("partial: " + a)
-                                    line_arr = [x, t, a, a1, "partial"]
+                                    line_arr = [user, t, "partial", status, entity, a, a1]
                                     tmp_line.append(line_arr)
-                                    tmp_right_ans.remove(a1)
-                                    tmp_user_ans.remove(a)
+                                    if tmp_right_ans:
+                                        tmp_right_ans.remove(a1)
+                                    if tmp_user_ans:
+                                        tmp_user_ans.remove(a)
+                                    partial = True
+                        if not partial:
+                            #print("incorrect: " + a)
+                            line_arr = [user, t, "incorrect", status, entity, a, "---"]
+                            tmp_line.append(line_arr)
+                            tmp_user_ans.remove(a)
                     else:
                         #print("incorrect: " + a)
-                        line_arr = [x, t, a, "---", "incorrect"]
+                        line_arr = [user, t, "incorrect", status, entity, a, "---"]
                         tmp_line.append(line_arr)
                         tmp_user_ans.remove(a)
 
                 if tmp_right_ans:
                     for r1 in tmp_right_ans:
                         #print("missing: " + r1)
-                        line_arr = [x, t, "---", r1, "missing"]
+                        line_arr = [user, t, "missing", status, entity, "---", r1]
                         tmp_line.append(line_arr)
 
                 #print()
 
-            if all_sent:
-                for s in all_sent:
-                    #print("not scored: " + s + ": " + ", ".join(base_entity_dict_answers[s]))
-                    line_arr = [x, s, "---", base_entity_dict_answers[s], "not scored"]
-                    tmp_line.append(line_arr)
+        if all_sent:
+            for s in all_sent:
+                #print("not scored: " + s + ": " + ", ".join(base_entity_dict_answers[s]))
+                line_arr = [user, s, entity, "not scored", status, "---", base_entity_dict_answers[s][entity]]
+                tmp_line.append(line_arr)
 
+
+def write_file():
+    output_file_name = file_name + '_base_entity_export.csv'
     with open(output_file_name, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(tmp_line)
 
 
-create_dict(data, base_entity_dict)
-get_answer_dict(data_answers, base_entity_dict_answers)
-#get_res()
-get_res2()
-print("Done!")
+if __name__ == '__main__':
+    create_dict(data, base_entity_dict)
+    get_answer_dict(data_answers, base_entity_dict_answers)
+
+    for x in all_users:
+        get_res("base", x, "highest")
+        get_res("typeOf", x, "highest")
+
+    write_file()
+    print("Done!")
 
 
 
