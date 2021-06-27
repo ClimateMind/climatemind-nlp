@@ -358,10 +358,10 @@ def get_tmp_dict(user):
                                            'predicate': [y['predicate']]
                                           }
 
-    print("=====================")
-    print(user)
-    print(len(tmp_dict))
-    print("=====================")
+    #print("=====================")
+    #print(user)
+    #print(len(tmp_dict))
+    #print("=====================")
     return tmp_dict
 
 def gen_rel_dicts(word, tmp_rel_dict):
@@ -388,14 +388,14 @@ def create_arr_res(user_ans, right_ans):
         for a in user_ans:
             if a in tmp_right_ans:
                 ans_arr.append("found")
-                print("found: " + a)
+                #print("found: " + a)
                 tmp_right_ans.remove(a)
                 tmp_user_ans.remove(a)
             elif len(a.split(" ")) > 1:
                 strings_with_substring = [string for string in tmp_right_ans if a in string]
                 if strings_with_substring:
                     ans_arr.append("partial")
-                    print("partial: " + a)
+                    #print("partial: " + a)
                     if strings_with_substring[0] not in del_right_ans:
                         del_right_ans.append(strings_with_substring[0])
                     if a not in del_user_ans:
@@ -403,7 +403,7 @@ def create_arr_res(user_ans, right_ans):
                 else:
                     for a1 in a.split(" "):
                         if a1 in tmp_right_ans:
-                            print("partial: " + a)
+                            #print("partial: " + a)
                             ans_arr.append("partial")
                             if a1 not in del_right_ans:
                                 del_right_ans.append(a1)
@@ -414,7 +414,7 @@ def create_arr_res(user_ans, right_ans):
                                 if len(ra.split(" ")) > 1:
                                     for a2 in a.split(" "):
                                         if a2 in ra.split(" "):
-                                            print("partial: " + a)
+                                            #print("partial: " + a)
                                             ans_arr.append("partial")
                                             if ra not in del_right_ans:
                                                 del_right_ans.append(ra)
@@ -425,7 +425,7 @@ def create_arr_res(user_ans, right_ans):
                     if len(ra.split(" ")) > 1:
                         for a2 in a.split(" "):
                             if a2 in ra.split(" "):
-                                print("partial: " + a)
+                                #print("partial: " + a)
                                 ans_arr.append("partial")
                                 if ra not in del_right_ans:
                                     del_right_ans.append(ra)
@@ -441,11 +441,11 @@ def create_arr_res(user_ans, right_ans):
 
         if tmp_right_ans:
             for r1 in tmp_right_ans:
-                print("missing: " + r1)
+                #print("missing: " + r1)
                 ans_arr.append("missing")
         if tmp_user_ans:
             for ua in tmp_user_ans:
-                print("incorrect: " + ua)
+                #print("incorrect: " + ua)
                 ans_arr.append("incorrect")
         
         return ans_arr
@@ -459,7 +459,7 @@ def check_rel(word, right_word, user_relation, right_relation):
     if word:
         if word in user_rel_dict:        
             user_rel = user_rel_dict[word]
-            print(user_rel_dict['label'])
+            #print(user_rel_dict['label'])
             user_label = user_rel_dict['label']
         else:
             user_rel = []
@@ -468,7 +468,7 @@ def check_rel(word, right_word, user_relation, right_relation):
     if right_word:
         if right_word in ans_rel_dict:
             answer_rel = ans_rel_dict[right_word]
-            print(ans_rel_dict['label'])
+            #print(ans_rel_dict['label'])
             ans_label = ans_rel_dict['label']
         else:
             answer_rel = []
@@ -506,12 +506,12 @@ def get_res(entity, user, status):
                 user_relation = []
             right_relation = relation_dict[answer_username][t]
             if right_ans:
-                print(t)
-                print(user_ans)
-                print(right_ans)
-                print(user_relation)
-                print("================================")
-                print(right_relation)
+                #print(t)
+                #print(user_ans)
+                #print(right_ans)
+                #print(user_relation)
+                #print("================================")
+                #print(right_relation)
                 tmp_user_ans = tmp_user_ans + user_ans
                 tmp_right_ans = tmp_right_ans + right_ans
                 del_right_ans = []
@@ -519,11 +519,11 @@ def get_res(entity, user, status):
                 for a in user_ans:
                     if a in tmp_right_ans:
                         ans1, ans2, ans3, ans4 = check_rel(a, a, user_relation, right_relation)
-                        #print("found: " + a)
-                        print(ans3)
-                        print("///")
-                        print(ans4)
-                        print("///")
+                        ##print("found: " + a)
+                        #print(ans3)
+                        #print("///")
+                        #print(ans4)
+                        #print("///")
                         if ans4 == "Contributes_To":
                             line_arr = [user, t, "found", [], ans1, status, entity, a, a, [], [], ans2, ans3]
                         elif ans4 == "Concept_Member":
@@ -537,10 +537,10 @@ def get_res(entity, user, status):
                     elif len(a.split(" ")) > 1:
                         # 1. if tmp_right_ans contains the user answer
                         strings_with_substring = [string for string in tmp_right_ans if a in string]
-                        #print(strings_with_substring)
-                        #print("---")
+                        ##print(strings_with_substring)
+                        ##print("---")
                         if strings_with_substring:
-                            #print("partial: " + a)
+                            ##print("partial: " + a)
                             ans1, ans2, ans3, ans4 = check_rel(a, strings_with_substring[0], user_relation, right_relation)
                             if ans4 == "Contributes_To":
                                 line_arr = [user, t, "partial", [], ans1, status, entity, a, strings_with_substring[0], [], [], ans2, ans3]
@@ -558,7 +558,7 @@ def get_res(entity, user, status):
                             # 2. check both the answer and user answer
                             for a1 in a.split(" "):
                                 if a1 in tmp_right_ans:
-                                    #print("partial: " + a)
+                                    ##print("partial: " + a)
                                     ans1, ans2, ans3, ans4 = check_rel(a, a1, user_relation, right_relation)
                                     if ans4 == "Contributes_To":
                                         line_arr = [user, t, "partial", [], ans1, status, entity, a, a1, [], [], ans2, ans3]
@@ -577,7 +577,7 @@ def get_res(entity, user, status):
                                         if len(ra.split(" ")) > 1:
                                             for a2 in a.split(" "):
                                                 if a2 in ra.split(" "):
-                                                    #print("partial: " + a)
+                                                    ##print("partial: " + a)
                                                     ans1, ans2, ans3, ans4 = check_rel(a, ra, user_relation, right_relation)
                                                     if ans4 == "Contributes_To":
                                                         line_arr = [user, t, "partial", [], ans1, status, entity, a, ra, [], [], ans2, ans3]
@@ -596,7 +596,7 @@ def get_res(entity, user, status):
                             if len(ra.split(" ")) > 1:
                                 for a2 in a.split(" "):
                                     if a2 in ra.split(" "):
-                                        #print("partial: " + a)
+                                        ##print("partial: " + a)
                                         ans1, ans2, ans3, ans4 = check_rel(a, ra, user_relation, right_relation)
                                         if ans4 == "Contributes_To":
                                             line_arr = [user, t, "partial", [], ans1, status, entity, a, ra, [], [], ans2, ans3]
@@ -621,7 +621,7 @@ def get_res(entity, user, status):
                 if tmp_right_ans:
                     for r1 in tmp_right_ans:
                         ans1, ans2, ans3, ans4 = check_rel(None, r1, user_relation, right_relation)
-                        #print("missing: " + r1)
+                        ##print("missing: " + r1)
                         if ans4 == "Contributes_To":
                             line_arr = [user, t, "missing", [], ans1, status, entity, "---", r1, [], [], ans2, ans3]
                         elif ans4 == "Concept_Member":
@@ -632,7 +632,7 @@ def get_res(entity, user, status):
                 if tmp_user_ans:
                     for ua in tmp_user_ans:
                         ans1, ans2, ans3, ans4 = check_rel(ua, None, user_relation, right_relation)
-                        #print("incorrect: " + ua)
+                        ##print("incorrect: " + ua)
                         if ans4 == "Contributes_To":
                             line_arr = [user, t, "incorrect", ["incorrect"], ans1, status, entity, ua, "---", [], [], ans2, ans3]
                         elif ans4 == "Concept_Member":
@@ -640,11 +640,11 @@ def get_res(entity, user, status):
                         else:
                             line_arr = [user, t, "incorrect", ans1, ans1, status, entity, ua, "---", ans2, ans3, ans2, ans3]
                         tmp_line.append(line_arr)
-                print()
+                #print()
 
         if all_sent:
             for s in all_sent:
-                #print("not scored: " + s + ": " + ", ".join(base_entity_dict_answers[s]))
+                ##print("not scored: " + s + ": " + ", ".join(base_entity_dict_answers[s]))
                 relation_dict[user][t]
                 relation_dict[answer_username][t]
                 line_arr = [user, s, "not scored", "---", "---", status, entity, "---", base_entity_dict_answers[s][entity], "---", [], "---", []]
