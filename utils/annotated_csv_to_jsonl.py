@@ -13,7 +13,7 @@ def main():
 
     output_file_path = args.input_file_path.replace(".csv", ".jsonl", 1)
     randomized_output_file_path = path.join(path.dirname(output_file_path),
-                                            "reversed_" + path.basename(output_file_path)
+                                            "randomized_" + path.basename(output_file_path)
                                             )
     json_data = []
     for index, row in data.iterrows():
