@@ -22,6 +22,8 @@ def main():
             for column in columns:
                     if column == "text":
                             row[column] = row[column].replace('\n','')
+                    if pd.isna(row[column]):
+                            row[column] = ""
                     line_contents[column] = row[column]
             json_data.append(line_contents)
 
