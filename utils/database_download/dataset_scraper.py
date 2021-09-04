@@ -4,7 +4,7 @@ import uuid
 import srsly # pip install srsly
 
 
-dataset_name = "cm_cause_effect_rel" # Change this to the name of the dataset you want to use
+dataset_name = "cm-label-eval" # Change this to the name of the dataset you want to use
 
 # Connect to the database using the prodigy.json file (Can also be found in slack)
 db = connect()
