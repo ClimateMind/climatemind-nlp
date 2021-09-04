@@ -10,9 +10,6 @@ def main():
 	
 	dataset_name = args.dataset_name  # the dataset you want to use
 
-	#with open("settings.json", "r") as read_file:
-	#	data = json.load(read_file)
-
 	# Connect to the database using the prodigy.json file (Can also be found in slack)
 	#db = connect(data["db"],data["db_settings"])
 	db = connect() #Prodigy automatically will use the settings in 'prodigy.json' file in this script's directory if running from this directory
