@@ -5,7 +5,7 @@ import csv
 import sys
 import datetime
 
-file_name = "checkin_two_all_entities"
+file_name = "checkin_three_all_labels"
 file_path = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name+".jsonl"
 file_name_answers = "answers_answers"
 file_path_answers = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name_answers+".jsonl"
@@ -14,7 +14,7 @@ data = srsly.read_jsonl(file_path)
 data_answers = srsly.read_jsonl(file_path_answers)
 
 answer_username = ""
-username_extra = "checkin_two_blank_all_labels-"
+username_extra = "checkin_three_all_labels-"
 
 csv_columns_sub = [
     "user",
@@ -57,96 +57,80 @@ def create_dict(datasource, dict_name, user=None):
 
         if username not in all_users:
             all_users.append(username)
+        try:
+            if entry['answer'] == "accept":
+                for conn in entry['relations']:
+                    head_span_start = conn["head_span"]["start"]
+                    head_span_end = conn["head_span"]["end"]
+                    child_rel_span_start = conn["child_span"]["start"]
+                    child_rel_span_end = conn["child_span"]["end"]
+                    if text[head_span_start:head_span_end]:
+                        head = text[head_span_start:head_span_end]
+                    else:
+                        head = ""
+                    if text[child_rel_span_start:child_rel_span_end]:
+                        child = [text[child_rel_span_start:child_rel_span_end]]
+                    else:
+                        child = []
 
-        if entry['answer'] == "accept":
-            for conn in entry['relations']:
-                head_span_start = conn["head_span"]["start"]
-                head_span_end = conn["head_span"]["end"]
-                child_rel_span_start = conn["child_span"]["start"]
-                child_rel_span_end = conn["child_span"]["end"]
-                if text[head_span_start:head_span_end]:
-                    head = text[head_span_start:head_span_end]
-                else:
-                    head = ""
-                if text[child_rel_span_start:child_rel_span_end]:
-                    child = [text[child_rel_span_start:child_rel_span_end]]
-                else:
-                    child = []
+                    if username in relation_dict:
+                        if text in relation_dict[username]:
+                            new_res = {'label': conn['label'], head:child}
+                            relation_dict[username][text].append(new_res.copy())
+                        else:
+                            relation_dict[username][text] = [{'label': conn['label'], head: child}]
+                    else:
+                        relation_dict[username] = {text: [{'label': conn['label'], head: child}]}
+                    
+                    for relation in entry['spans']:
+                        if ("label" in relation) and ("start" in relation) and ("end" in relation):
+                            child_span_start = relation["start"]
+                            child_span_end = relation["end"]
 
-                if username in relation_dict:
-                    if text in relation_dict[username]:
-                        new_res = {'label': conn['label'], head:child}
-                        relation_dict[username][text].append(new_res.copy())
-                    else:
-                        relation_dict[username][text] = [{'label': conn['label'], head: child}]
-                else:
-                    relation_dict[username] = {text: [{'label': conn['label'], head: child}]}
+                            if relation["label"] == "base":
+                                base_entity = text[child_span_start:child_span_end]
+                            else:
+                                base_entity = ""
+                            if relation["label"] == "type_of":
+                                type_of = text[child_span_start:child_span_end]
+                            else:
+                                type_of = ""
+                            if relation["label"] == "change_direction":
+                                change_dir = text[child_span_start:child_span_end]
+                            else:
+                                change_dir = ""
+                            if relation["label"] == "aspect_changing":
+                                aspect_change = text[child_span_start:child_span_end]
+                            else:
+                                aspect_change = ""
+                            if relation["label"] == "to_whom":
+                                to_whom = text[child_span_start:child_span_end]
+                            else:
+                                to_whom = ""
+                            if relation["label"] == "effect_size":
+                                effect_size = text[child_span_start:child_span_end]
+                            else:
+                                effect_size = ""
+                            if relation["label"] == "confidence":
+                                confidence = text[child_span_start:child_span_end]
+                            else:
+                                confidence = ""
+                            if relation["label"] == "where":
+                                where = text[child_span_start:child_span_end]
+                            else:
+                                where = ""
+                            if relation["label"] == "when":
+                                when = text[child_span_start:child_span_end]
+                            else:
+                                when = ""
+                            if relation["label"] == "predicate":
+                                predicate = text[child_span_start:child_span_end]
+                            else:
+                                predicate = ""
 
-            for relation in entry['spans']:
-                if ("label" in relation) and ("start" in relation) and ("end" in relation):
-                    child_span_start = relation["start"]
-                    child_span_end = relation["end"]
-
-                    if relation["label"] == "base":
-                        base_entity = text[child_span_start:child_span_end]
-                    else:
-                        base_entity = ""
-                    if relation["label"] == "type_of":
-                        type_of = text[child_span_start:child_span_end]
-                    else:
-                        type_of = ""
-                    if relation["label"] == "change_direction":
-                        change_dir = text[child_span_start:child_span_end]
-                    else:
-                        change_dir = ""
-                    if relation["label"] == "aspect_changing":
-                        aspect_change = text[child_span_start:child_span_end]
-                    else:
-                        aspect_change = ""
-                    if relation["label"] == "to_whom":
-                        to_whom = text[child_span_start:child_span_end]
-                    else:
-                        to_whom = ""
-                    if relation["label"] == "effect_size":
-                        effect_size = text[child_span_start:child_span_end]
-                    else:
-                        effect_size = ""
-                    if relation["label"] == "confidence":
-                        confidence = text[child_span_start:child_span_end]
-                    else:
-                        confidence = ""
-                    if relation["label"] == "where":
-                        where = text[child_span_start:child_span_end]
-                    else:
-                        where = ""
-                    if relation["label"] == "when":
-                        when = text[child_span_start:child_span_end]
-                    else:
-                        when = ""
-                    if relation["label"] == "predicate":
-                        predicate = text[child_span_start:child_span_end]
-                    else:
-                        predicate = ""
-
-                    if username in dict_name:
-                        old_val = dict_name[username]
-                        old_val.append({"base": base_entity,
-                                        "text": text,
-                                        "username": username,
-                                        "type_of": type_of,
-                                        "change_direction": change_dir,
-                                        "aspect_changing": aspect_change,
-                                        "to_whom": to_whom,
-                                        "effect_size": effect_size,
-                                        "confidence": confidence,
-                                        "where": where,
-                                        "when": when,
-                                        "predicate": predicate,
-                                        "relation": relation_dict[username][text]
-                                        })
-                        dict_name[username] = old_val
-                    else:
-                        dict_name[username] = [{"base": base_entity,
+                            if username in dict_name:
+                                old_val = dict_name[username]
+                                old_val.append({"base": base_entity,
                                                 "text": text,
                                                 "username": username,
                                                 "type_of": type_of,
@@ -159,38 +143,58 @@ def create_dict(datasource, dict_name, user=None):
                                                 "when": when,
                                                 "predicate": predicate,
                                                 "relation": relation_dict[username][text]
-                                                }]
-        else:
-            if username in dict_name:
-                old_val = dict_name[username]
-                old_val.append({"base": "No base",
-                                "text": text,
-                                "username": username,
-                                "type_of": "No type_of",
-                                "change_direction": "No change_direction",
-                                "aspect_changing": "No aspect_change",
-                                "to_whom": "No to_whom",
-                                "effect_size": "No effect_size",
-                                "confidence": "No confidence",
-                                "where": "No where",
-                                "when": "No when",
-                                "predicate": "No predicate",
-                                })
-                dict_name[username] = old_val
+                                                })
+                                dict_name[username] = old_val
+                            else:
+                                dict_name[username] = [{"base": base_entity,
+                                                    "text": text,
+                                                    "username": username,
+                                                    "type_of": type_of,
+                                                    "change_direction": change_dir,
+                                                    "aspect_changing": aspect_change,
+                                                    "to_whom": to_whom,
+                                                    "effect_size": effect_size,
+                                                    "confidence": confidence,
+                                                    "where": where,
+                                                    "when": when,
+                                                    "predicate": predicate,
+                                                    "relation": relation_dict[username][text]
+                                                    }]
             else:
-                dict_name[username] = [{"base": "No base",
-                                        "text": text,
-                                        "username": username,
-                                        "type_of": "No type_of",
-                                        "change_direction": "No change_direction",
-                                        "aspect_changing": "No aspect_change",
-                                        "to_whom": "No to_whom",
-                                        "effect_size": "No effect_size",
-                                        "confidence": "No confidence",
-                                        "where": "No where",
-                                        "when": "No when",
-                                        "predicate": "No predicate"
-                                        }]
+                if username in dict_name:
+                    old_val = dict_name[username]
+                    old_val.append({"base": "No base",
+                                    "text": text,
+                                    "username": username,
+                                    "type_of": "No type_of",
+                                    "change_direction": "No change_direction",
+                                    "aspect_changing": "No aspect_change",
+                                    "to_whom": "No to_whom",
+                                    "effect_size": "No effect_size",
+                                    "confidence": "No confidence",
+                                    "where": "No where",
+                                    "when": "No when",
+                                    "predicate": "No predicate",
+                                    })
+                    dict_name[username] = old_val
+                else:
+                    dict_name[username] = [{"base": "No base",
+                                            "text": text,
+                                            "username": username,
+                                            "type_of": "No type_of",
+                                            "change_direction": "No change_direction",
+                                            "aspect_changing": "No aspect_change",
+                                            "to_whom": "No to_whom",
+                                            "effect_size": "No effect_size",
+                                            "confidence": "No confidence",
+                                            "where": "No where",
+                                            "when": "No when",
+                                            "predicate": "No predicate"
+                                            }]
+            
+        except KeyError as k:
+            continue
+        
 
 def create_count_dict(entity):
     if entity in count_dict:
@@ -201,7 +205,6 @@ def create_count_dict(entity):
 def create_count_dict_user(entity, user):
     if user not in count_dict_user:
         count_dict_user[user] = {}
-
     if entity in count_dict_user[user]:
         count_dict_user[user][entity] += 1
     else:
@@ -519,7 +522,7 @@ def get_res(entity, user, status):
                 for a in user_ans:
                     if a in tmp_right_ans:
                         ans1, ans2, ans3, ans4 = check_rel(a, a, user_relation, right_relation)
-                        ##print("found: " + a)
+                        #print("found: " + a)
                         #print(ans3)
                         #print("///")
                         #print(ans4)
@@ -537,10 +540,10 @@ def get_res(entity, user, status):
                     elif len(a.split(" ")) > 1:
                         # 1. if tmp_right_ans contains the user answer
                         strings_with_substring = [string for string in tmp_right_ans if a in string]
-                        ##print(strings_with_substring)
-                        ##print("---")
+                        #print(strings_with_substring)
+                        #print("---")
                         if strings_with_substring:
-                            ##print("partial: " + a)
+                            #print("partial: " + a)
                             ans1, ans2, ans3, ans4 = check_rel(a, strings_with_substring[0], user_relation, right_relation)
                             if ans4 == "Contributes_To":
                                 line_arr = [user, t, "partial", [], ans1, status, entity, a, strings_with_substring[0], [], [], ans2, ans3]
@@ -558,7 +561,7 @@ def get_res(entity, user, status):
                             # 2. check both the answer and user answer
                             for a1 in a.split(" "):
                                 if a1 in tmp_right_ans:
-                                    ##print("partial: " + a)
+                                    #print("partial: " + a)
                                     ans1, ans2, ans3, ans4 = check_rel(a, a1, user_relation, right_relation)
                                     if ans4 == "Contributes_To":
                                         line_arr = [user, t, "partial", [], ans1, status, entity, a, a1, [], [], ans2, ans3]
@@ -577,7 +580,7 @@ def get_res(entity, user, status):
                                         if len(ra.split(" ")) > 1:
                                             for a2 in a.split(" "):
                                                 if a2 in ra.split(" "):
-                                                    ##print("partial: " + a)
+                                                    #print("partial: " + a)
                                                     ans1, ans2, ans3, ans4 = check_rel(a, ra, user_relation, right_relation)
                                                     if ans4 == "Contributes_To":
                                                         line_arr = [user, t, "partial", [], ans1, status, entity, a, ra, [], [], ans2, ans3]
@@ -596,7 +599,7 @@ def get_res(entity, user, status):
                             if len(ra.split(" ")) > 1:
                                 for a2 in a.split(" "):
                                     if a2 in ra.split(" "):
-                                        ##print("partial: " + a)
+                                        #print("partial: " + a)
                                         ans1, ans2, ans3, ans4 = check_rel(a, ra, user_relation, right_relation)
                                         if ans4 == "Contributes_To":
                                             line_arr = [user, t, "partial", [], ans1, status, entity, a, ra, [], [], ans2, ans3]
@@ -621,7 +624,7 @@ def get_res(entity, user, status):
                 if tmp_right_ans:
                     for r1 in tmp_right_ans:
                         ans1, ans2, ans3, ans4 = check_rel(None, r1, user_relation, right_relation)
-                        ##print("missing: " + r1)
+                        #print("missing: " + r1)
                         if ans4 == "Contributes_To":
                             line_arr = [user, t, "missing", [], ans1, status, entity, "---", r1, [], [], ans2, ans3]
                         elif ans4 == "Concept_Member":
@@ -632,7 +635,7 @@ def get_res(entity, user, status):
                 if tmp_user_ans:
                     for ua in tmp_user_ans:
                         ans1, ans2, ans3, ans4 = check_rel(ua, None, user_relation, right_relation)
-                        ##print("incorrect: " + ua)
+                        #print("incorrect: " + ua)
                         if ans4 == "Contributes_To":
                             line_arr = [user, t, "incorrect", ["incorrect"], ans1, status, entity, ua, "---", [], [], ans2, ans3]
                         elif ans4 == "Concept_Member":
@@ -644,7 +647,7 @@ def get_res(entity, user, status):
 
         if all_sent:
             for s in all_sent:
-                ##print("not scored: " + s + ": " + ", ".join(base_entity_dict_answers[s]))
+                #print("not scored: " + s + ": " + ", ".join(base_entity_dict_answers[s]))
                 relation_dict[user][t]
                 relation_dict[answer_username][t]
                 line_arr = [user, s, "not scored", "---", "---", status, entity, "---", base_entity_dict_answers[s][entity], "---", [], "---", []]
@@ -679,8 +682,7 @@ def write_grade_file(user=None):
                 "effect_size", "confidence", "where", "when", "predicate"]
     lines.append(lines_headers)
     for key, val in count_dict_user.items():
-        res_lines = [key, calc_pct('base', val), calc_pct('type_of', val), calc_pct('change_direction', val), 
-        calc_pct('aspect_changing', val), calc_pct('to_whom', val), calc_pct('effect_size', val), 
+        res_lines = [key, calc_pct('base', val), calc_pct('type_of', val), calc_pct('change_direction', val), calc_pct('aspect_changing', val), calc_pct('to_whom', val), calc_pct('effect_size', val), 
         calc_pct('confidence', val), calc_pct('where', val), calc_pct('when', val), calc_pct('predicate', val)]
         lines.append(res_lines)
 
@@ -694,6 +696,7 @@ if __name__ == '__main__':
     get_answer_username()
     create_dict(data, base_entity_dict)
     get_answer_dict(data_answers, base_entity_dict_answers)
+
     if len(sys.argv) == 2:
         if str(sys.argv[-1]) not in all_users:
             print("Username " + str(sys.argv[-1]) + " not found. Please enter a different name")

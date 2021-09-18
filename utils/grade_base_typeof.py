@@ -4,7 +4,7 @@ import datetime
 import srsly
 import csv
 
-file_name = "checkin2_base_typeof"
+file_name = "checkin_four_all_labels"
 file_path = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name+".jsonl"
 file_name_answers = "answers_answers"
 file_path_answers = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name_answers+".jsonl"
@@ -43,55 +43,64 @@ def create_dict(datasource, dict_name):
             username = entry["_session_id"]
         else:
             username = ""
-        username = username.replace("checkin_two_blank_bases_typeof-", "")
+        username = username.replace("checkin_four_all_labels-", "")
 
         if username not in all_users:
             all_users.append(username)
+        if username == "Mukut":
+            try:
+                if entry['answer'] == "accept":
+                    for relation in entry["spans"]:
+                        if "label" in relation:
+                            try:
+                                child_span_start = relation["start"]
+                                child_span_end = relation["end"]
+                                dict_key = str(child_span_start) + ":" + str(child_span_end)
+                                if relation["label"] == "base":
+                                    base_entity = text[child_span_start:child_span_end]
+                                else:
+                                    base_entity = ""
+                                if relation["label"] == "type_of":
+                                    type_of = text[child_span_start:child_span_end]
+                                else:
+                                    type_of = ""
 
-        if entry['answer'] == "accept":
-            for relation in entry["spans"]:
-                if "label" in relation:
-                    child_span_start = relation["start"]
-                    child_span_end = relation["end"]
-                    dict_key = str(child_span_start) + ":" + str(child_span_end)
-                    if relation["label"] == "base":
-                        base_entity = text[child_span_start:child_span_end]
+                                if username in dict_name:
+                                    old_val = dict_name[username]
+                                    old_val.append({"base": base_entity,
+                                                    "text": text,
+                                                    "username": username,
+                                                    "type_of": type_of
+                                                    })
+                                    dict_name[username] = old_val
+                                else:
+                                    dict_name[username] = [{"base": base_entity,
+                                                            "text": text,
+                                                            "username": username,
+                                                            "type_of": type_of
+                                                            }]
+                            except KeyError as k:
+                                continue
                     else:
-                        base_entity = ""
-                    if relation["label"] == "type_of":
-                        type_of = text[child_span_start:child_span_end]
-                    else:
-                        type_of = ""
+                        if username in dict_name:
+                            old_val = dict_name[username]
+                            old_val.append({"base": "No base",
+                                            "text": text,
+                                            "username": username,
+                                            "type_of": "No type_of"
+                                            })
+                            dict_name[username] = old_val
+                        else:
+                            dict_name[username] = [{"base": "No base",
+                                                    "text": text,
+                                                    "username": username,
+                                                "type_of": "No type_of"
+                                                    }]
+                
+            except KeyError as k:
+                continue
 
-                    if username in dict_name:
-                        old_val = dict_name[username]
-                        old_val.append({"base": base_entity,
-                                        "text": text,
-                                        "username": username,
-                                        "type_of": type_of
-                                        })
-                        dict_name[username] = old_val
-                    else:
-                        dict_name[username] = [{"base": base_entity,
-                                                "text": text,
-                                                "username": username,
-                                                "type_of": type_of
-                                                }]
-        else:
-            if username in dict_name:
-                old_val = dict_name[username]
-                old_val.append({"base": "No base",
-                                "text": text,
-                                "username": username,
-                                "type_of": "No type_of"
-                                })
-                dict_name[username] = old_val
-            else:
-                dict_name[username] = [{"base": "No base",
-                                        "text": text,
-                                        "username": username,
-                                        "type_of": "No type_of"
-                                        }]
+
 def create_count_dict(entity):
     if entity in count_dict:
         count_dict[entity] += 1
@@ -265,9 +274,6 @@ if __name__ == '__main__':
     for x in all_users:
         get_res("base", x, "highest")
         get_res("type_of", x, "highest")
-
-    print(count_dict)
-    print(count_dict_user)
 
     write_file()
     write_grade_file()
