@@ -84,7 +84,7 @@ class InterannotatorAgreement():
             # removing punctuations from the sentence
             text = re.sub(r'[^\w\s]', '', text)
             for word in text.split(" "):
-                token_number = text.index(word) + 1
+                token_number = text.split(" ").index(word)
                 entity = self.get_extra(entry, word)
                 if word in entity:
                     arr = [username, text, document_id, sentence_id, word, token_number, "entity"] + entity[word] + entity[word][1:]
