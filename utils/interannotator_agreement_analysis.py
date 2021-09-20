@@ -18,7 +18,7 @@ data_entity = data_entity[data_entity['annotator']!="answers"]
 
 #for each token (word) of every sentence, what are the range of 'types' for the feature 'entity' and for a given token which type has the max agreement % and what is that %?
 #and count how many unique 'type' fields represented in each and save the output
-grouped = data_entity.groupby(by=["document id", "sentence id", "word", "token number"], as_index=False)
+grouped = data_entity.groupby(by=["sentence", "document id", "sentence id", "word", "token number"], as_index=False)
 
 #https://pandas.pydata.org/pandas-docs/stable/user_guide/groupby.html#groupby-aggregate-named
 
@@ -50,29 +50,6 @@ result = grouped.agg(
 result["max_agreement"] = result.max_agreement.round(2)
 
 
-def get_max_percent(df):
-	cols_of_interest = [
-	"none_count", 
-	"base_count", 
-	"type_of_count", 
-	"aspect_changing_count", 
-	"change_direction_count", 
-	"to_whom_count", 
-	"where_count", 
-	"when_count",
-	"effect_size_count",
-	"confidence_count",
-	"predicate_count"
-	]
-	max_metric = df[cols_of_interest].max()
-	percent = max_metric/df[cols_of_interest].sum()
-
-	return percent
-
-def create_list(series):
-    return reduce(lambda x, y: (x + y, series))
-
-
 # columns for annotator names that are in the agreement and not in the agreement
 joined_data = data_entity.merge(result, on=["document id", "sentence id", "word", "token number"])
 
@@ -88,7 +65,8 @@ grouped_agreement_annotators["agreement_annotators"] = grouped_agreement_annotat
 grouped_disagreement_annotators["disagreement_annotators"] = grouped_disagreement_annotators["annotator"]
 
 result_final = result.merge(grouped_agreement_annotators[["document id", "sentence id", "word", "token number","agreement_annotators"]], on=["document id", "sentence id", "word", "token number"])
-result_final = result_final.merge(grouped_disagreement_annotators[["document id", "sentence id", "word", "token number","disagreement_annotators"]], on=["document id", "sentence id", "word", "token number"])
+result_final = result_final.merge(grouped_disagreement_annotators[["document id", "sentence id", "word", "token number", "disagreement_annotators"]], on=["document id", "sentence id", "word", "token number"])
+
 
 
 #save the result as output file
