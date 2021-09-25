@@ -83,19 +83,19 @@ class InterannotatorAgreement():
 
             # removing punctuations from the sentence
             text = re.sub(r'[^\w\s]', '', text)
-            for word in text.split(" "):
-                token_number = text.split(" ").index(word)
+            for index, word in enumerate(text.split(" ")):
                 entity = self.get_extra(entry, word)
+            
                 if word in entity:
-                    arr = [username, text, document_id, sentence_id, word, token_number, "entity"] + entity[word] + entity[word][1:]
+                    arr = [username, text, document_id, sentence_id, word, index, "entity"] + entity[word] + entity[word][1:]
                 else:
-                    arr = [username, text, document_id, sentence_id, word, token_number, "entity"] + ["None", "None", "None", "None", "None"]
+                    arr = [username, text, document_id, sentence_id, word, index, "entity"] + ["None", "None", "None", "None", "None"]
                 self.result.append(arr)
 
                 for r in relations:
                     if word in r:
-                        arr = [username, text, document_id, sentence_id, word, token_number, "relationship", r['label']] + r[word]
-                        self.result.append(arr)
+                        arr_rel = [username, text, document_id, sentence_id, word, index, "relationship", r['label']] + r[word]
+                        self.result.append(arr_rel)
 
     def get_extra(self, entry, word):
         text = entry["text"]
