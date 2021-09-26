@@ -3,7 +3,7 @@ import pandas as pd
 from functools import reduce 
 
 
-data_file = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 - checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540.csv"
+data_file = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/checkin_three_all_labels_interannotator_agreement_data_setup_09-25-2021_160514 - checkin_three_all_labels_interannotator_agreement_data_setup_09-25-2021_160514.csv"
 
 #read in the data
 data = pd.read_csv(data_file)
@@ -14,13 +14,41 @@ column_names = list(data.columns)
 data_entity = data[data['feature']=="entity"]
 
 #filter to remove 'answers' from the annotations
-data_entity = data_entity[data_entity['annotator']!="answers"]
+#data_entity = data_entity[data_entity['annotator']!="answers"]
 
 #for each token (word) of every sentence, what are the range of 'types' for the feature 'entity' and for a given token which type has the max agreement % and what is that %?
 #and count how many unique 'type' fields represented in each and save the output
 grouped = data_entity.groupby(by=["sentence", "document id", "sentence id", "word", "token number"], as_index=False)
 
 #https://pandas.pydata.org/pandas-docs/stable/user_guide/groupby.html#groupby-aggregate-named
+
+#function to get 2nd most popular item
+def get_most_popular_2nd(annotations):
+	most_popular_annotations = annotations.value_counts().index
+	if len(most_popular_annotations) > 1:
+		result = most_popular_annotations[1]
+	else:
+		result = "--"
+	return result 
+
+#function to get 3rd most popular item
+def get_most_popular_3rd(annotations):
+	most_popular_annotations = annotations.value_counts().index
+	if len(most_popular_annotations) > 2:
+		result = most_popular_annotations[2]
+	else:
+		result = "--"
+	return result 
+
+#function to get 4th most popular item
+def get_most_popular_4th(annotations):
+	most_popular_annotations = annotations.value_counts().index
+	if len(most_popular_annotations) > 3:
+		result = most_popular_annotations[3]
+	else:
+		result = "--"
+	return result 
+
 
 # columns with counts for each entity type possible
 # column for total number of annotators for that sentence
@@ -42,10 +70,13 @@ result = grouped.agg(
 	annotators_total=pd.NamedAgg(column="type", aggfunc="count"),
 	unique_annotations=pd.NamedAgg(column="type", aggfunc="nunique"),
 	max_agreement=pd.NamedAgg(column="type", aggfunc=lambda x:x.value_counts()[0]/x.count()*100),
-	most_popular=pd.NamedAgg(column="type", aggfunc=lambda x: pd.Series.mode(x)),
+	#most_popular=pd.NamedAgg(column="type", aggfunc=lambda x: pd.Series.mode(x)),
+	most_popular_1st=pd.NamedAgg(column="type", aggfunc=lambda x:x.value_counts().index[0]),
+	most_popular_2nd=pd.NamedAgg(column="type", aggfunc=lambda x:get_most_popular_2nd(x)),
+	most_popular_3rd=pd.NamedAgg(column="type", aggfunc=lambda x:get_most_popular_3rd(x)),
+	most_popular_4th=pd.NamedAgg(column="type", aggfunc=lambda x:get_most_popular_4th(x)),
 	popularity_tie=pd.NamedAgg(column="type", aggfunc=lambda x: pd.Series.mode(x).count()>1)
 	)
-
 
 result["max_agreement"] = result.max_agreement.round(2)
 
@@ -53,9 +84,9 @@ result["max_agreement"] = result.max_agreement.round(2)
 # columns for annotator names that are in the agreement and not in the agreement
 joined_data = data_entity.merge(result, on=["document id", "sentence id", "word", "token number"])
 
-agreement_annotators = joined_data.loc[joined_data.apply(lambda x: x["type"] in x["most_popular"], axis=1),["annotator", "document id", "sentence id", "word", "token number"]]
+agreement_annotators = joined_data.loc[joined_data.apply(lambda x: x["type"] in x["most_popular_1st"], axis=1),["annotator", "document id", "sentence id", "word", "token number"]]
 
-disagreement_annotators = joined_data.loc[joined_data.apply(lambda x: x["type"] not in x["most_popular"], axis=1),["annotator", "document id", "sentence id", "word", "token number"]]
+disagreement_annotators = joined_data.loc[joined_data.apply(lambda x: x["type"] not in x["most_popular_1st"], axis=1),["annotator", "document id", "sentence id", "word", "token number"]]
 
 grouped_agreement_annotators = agreement_annotators.groupby(by=["document id", "sentence id", "word", "token number"])["annotator"].apply(", ".join).reset_index()
 
@@ -71,6 +102,7 @@ result_final = result_final.merge(grouped_disagreement_annotators[["document id"
 
 #save the result as output file
 output_path = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 - checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 entity interannotator agreement.csv"
+#output_path = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 - checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 entity interannotator agreement_without_answers.csv"
 result_final.to_csv(output_path)
 
 
