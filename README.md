@@ -6,7 +6,7 @@ If you want to get involved head over to [our site](https://climatemind.org/#get
 
 ## Development
 
-We're currently at work labeling thousands of sentences for our models! If you want to see some of our WIP models just head over to `src/model_dev`. Otherwise check back later for dataset & model releases.
+We're currently at work labeling thousands of sentences for our models! If you want to see some of our WIP model code just head over to `src/model_dev`. Otherwise check back later for dataset & model releases.
 
 ## Thanks
 
