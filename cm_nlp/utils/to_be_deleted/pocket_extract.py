@@ -7,30 +7,8 @@ import pandas as pd
 import requests
 import sys
 
-def url(endpoint):
-    return "https://getpocket.com/v3/" + endpoint
 
-def authorize(consumer_key, headers = {"X-Accept": "application/json"}):
-    redirect_uri = "https://google.com"
-    req = requests.post(url("oauth/request"), data={
-        "consumer_key": consumer_key,
-        "redirect_uri": redirect_uri
-    }, headers=headers)
-    request_token = req.json()["code"]
-    print("<<< After signing in at link below press ENTER >>>")
-    print(f"https://getpocket.com/auth/authorize?request_token={request_token}&redirect_uri={redirect_uri}")
-    input() # super hacky way of making it wait
-    # After authenticating the request_token ask for an access token
-    res = requests.post(url("oauth/authorize"), data={
-        "consumer_key": consumer_key,
-        "code": request_token,
-    }, headers=headers)
 
-    if not res.ok:
-        print("ERROR: Authorization failed:", req.text)
-        sys.exit(1)
-
-    return res.json()["access_token"]
 
 def main():
     # Get consumer_token from website
