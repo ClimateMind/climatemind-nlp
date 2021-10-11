@@ -14,7 +14,7 @@ column_names = list(data.columns)
 data_entity = data[data['feature']=="entity"]
 
 #filter to remove 'answers' from the annotations
-#data_entity = data_entity[data_entity['annotator']!="answers"]
+data_entity = data_entity[data_entity['annotator']!="answers"]
 
 #for each token (word) of every sentence, what are the range of 'types' for the feature 'entity' and for a given token which type has the max agreement % and what is that %?
 #and count how many unique 'type' fields represented in each and save the output
@@ -55,6 +55,7 @@ def get_most_popular_4th(annotations):
 # column for number of unique different types 
 # column for entity type with the most number of counts
 # % agreement for the most popular annotation
+
 result = grouped.agg(
 	none_count=pd.NamedAgg(column="type", aggfunc=lambda x: x[x== 'None'].count()),
 	base_count=pd.NamedAgg(column="type", aggfunc=lambda x: x[x== 'base'].count()),
@@ -70,8 +71,8 @@ result = grouped.agg(
 	annotators_total=pd.NamedAgg(column="type", aggfunc="count"),
 	unique_annotations=pd.NamedAgg(column="type", aggfunc="nunique"),
 	max_agreement=pd.NamedAgg(column="type", aggfunc=lambda x:x.value_counts()[0]/x.count()*100),
-	#most_popular=pd.NamedAgg(column="type", aggfunc=lambda x: pd.Series.mode(x)),
-	most_popular_1st=pd.NamedAgg(column="type", aggfunc=lambda x:x.value_counts().index[0]),
+	most_popular_1st=pd.NamedAgg(column="type", aggfunc=lambda x: pd.Series.mode(x)),
+	#most_popular_1st=pd.NamedAgg(column="type", aggfunc=lambda x:x.value_counts().index[0]),
 	most_popular_2nd=pd.NamedAgg(column="type", aggfunc=lambda x:get_most_popular_2nd(x)),
 	most_popular_3rd=pd.NamedAgg(column="type", aggfunc=lambda x:get_most_popular_3rd(x)),
 	most_popular_4th=pd.NamedAgg(column="type", aggfunc=lambda x:get_most_popular_4th(x)),
@@ -96,7 +97,7 @@ grouped_agreement_annotators["agreement_annotators"] = grouped_agreement_annotat
 grouped_disagreement_annotators["disagreement_annotators"] = grouped_disagreement_annotators["annotator"]
 
 result_final = result.merge(grouped_agreement_annotators[["document id", "sentence id", "word", "token number","agreement_annotators"]], on=["document id", "sentence id", "word", "token number"])
-result_final = result_final.merge(grouped_disagreement_annotators[["document id", "sentence id", "word", "token number", "disagreement_annotators"]], on=["document id", "sentence id", "word", "token number"])
+result_final = result_final.merge(grouped_disagreement_annotators[["document id", "sentence id", "word", "token number", "disagreement_annotators"]],how='left', on=["document id", "sentence id", "word", "token number"])
 
 
 
@@ -104,6 +105,8 @@ result_final = result_final.merge(grouped_disagreement_annotators[["document id"
 output_path = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 - checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 entity interannotator agreement.csv"
 #output_path = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 - checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 entity interannotator agreement_without_answers.csv"
 result_final.to_csv(output_path)
+
+#this script appears to censor annotations with 100% agreement for some reason... why?!
 
 
 #https://pbpython.com/groupby-agg.html
