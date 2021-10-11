@@ -106,8 +106,6 @@ output_path = "/Users/kameronr/Documents/personal/climate change outreach/new up
 #output_path = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 - checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 entity interannotator agreement_without_answers.csv"
 result_final.to_csv(output_path)
 
-#this script appears to censor annotations with 100% agreement for some reason... why?!
-
 
 #https://pbpython.com/groupby-agg.html
 #https://medium.com/escaletechblog/writing-custom-aggregation-functions-with-pandas-96f5268a8596
