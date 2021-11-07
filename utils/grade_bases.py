@@ -5,10 +5,17 @@ import csv
 import sys
 import datetime
 
+
 file_name = "checkin_three_all_labels"
 file_path = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name+".jsonl"
 file_name_answers = "answers_answers"
 file_path_answers = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name_answers+".jsonl"
+
+file_name = "entity_checkin_one_download_6May21"
+file_path = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/"+file_name+".jsonl"
+file_name_answers = "ElleGettingAnswers_answers"
+file_path_answers = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/"+file_name_answers+".jsonl"
+
 
 data = srsly.read_jsonl(file_path)
 data_answers = srsly.read_jsonl(file_path_answers)
@@ -315,6 +322,7 @@ def get_answer_dict(datasource, dict_name):
 def get_tmp_dict(user):
     tmp_dict = {}
     for x in base_entity_dict:
+<<<<<<< Updated upstream
         for y in base_entity_dict[x]:
             if y['username'] == user and y['text'] in base_entity_dict_answers:
                 if y['text'] in tmp_dict:
@@ -423,6 +431,15 @@ def create_arr_res(user_ans, right_ans):
                                                 del_right_ans.append(ra)
                                             if a not in del_user_ans:
                                                 del_user_ans.append(a)
+=======
+        key_tmp = base_entity_dict[x]
+        for u in key_tmp:
+            ans = base_entity_dict_answers[u['text']]
+            breakpoint()
+            if u['base'] in ans:
+                u['correct'] = True
+                u['correct_base'] = u['base']
+>>>>>>> Stashed changes
             else:
                 for ra in tmp_right_ans:
                     if len(ra.split(" ")) > 1:
