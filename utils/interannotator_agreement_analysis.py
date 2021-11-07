@@ -3,8 +3,8 @@ import pandas as pd
 from functools import reduce 
 
 
-data_file = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/checkin_three_all_labels_interannotator_agreement_data_setup_09-25-2021_160514 - checkin_three_all_labels_interannotator_agreement_data_setup_09-25-2021_160514.csv"
-
+#data_file = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/checkin_three_all_labels_interannotator_agreement_data_setup_09-25-2021_160514 - checkin_three_all_labels_interannotator_agreement_data_setup_09-25-2021_160514.csv"
+data_file = "/Users/kameronr/Downloads/main_3_per_cluster_interannotator_agreement_data_setup_10-31-2021_124815.csv"
 #read in the data
 data = pd.read_csv(data_file)
 
@@ -102,7 +102,8 @@ result_final = result_final.merge(grouped_disagreement_annotators[["document id"
 
 
 #save the result as output file
-output_path = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 - checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 entity interannotator agreement.csv"
+#output_path = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 - checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 entity interannotator agreement.csv"
+output_path = "/Users/kameronr/Downloads/main_3_per_cluster_interannotator_agreement_data_setup_10-31-2021_124815 agreement.csv"
 #output_path = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 - checkin_three_all_labels_interannotator_agreement_data_setup_09-18-2021_132540 entity interannotator agreement_without_answers.csv"
 result_final.to_csv(output_path)
 
