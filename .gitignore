@@ -145,3 +145,9 @@ ProdigyLicenseKey.txt
 # This json contains some of our Azure secrets so becare about comitting it
 prodigy.json
 prodigy_testing/
+
+# vscode
+.vscode
+
+# locked
+.~lock*
