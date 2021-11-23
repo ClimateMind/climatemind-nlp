@@ -13,7 +13,7 @@ file_path_answers = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp
 data = srsly.read_jsonl(file_path)
 data_answers = srsly.read_jsonl(file_path_answers)
 
-answer_username = ""
+answer_username = "answers"
 username_extra = "checkin_three_all_labels-"
 
 csv_columns_sub = [
@@ -616,10 +616,12 @@ def get_res(entity, user, status):
 
                 if del_user_ans:
                     for da in del_user_ans:
-                        tmp_user_ans.remove(da)
+                        if da in tmp_user_ans:
+                            tmp_user_ans.remove(da)
                 if del_right_ans:
                     for dr in del_right_ans:
-                        tmp_right_ans.remove(dr)                            
+                        if dr in tmp_right_ans:
+                            tmp_right_ans.remove(dr)                            
 
                 if tmp_right_ans:
                     for r1 in tmp_right_ans:
@@ -693,7 +695,8 @@ def write_grade_file(user=None):
     print("Created file: " + output_file_name_grades)
 
 if __name__ == '__main__':
-    get_answer_username()
+    #get_answer_username()
+    #print(get_answer_username())
     create_dict(data, base_entity_dict)
     get_answer_dict(data_answers, base_entity_dict_answers)
 

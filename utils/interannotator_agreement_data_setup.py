@@ -21,11 +21,11 @@ class InterannotatorAgreement():
         "feature tail span end token number"
     ]
 
-    file_name = "checkin_three_all_labels"
+    file_name = "checkin_four_all_labels"
     file_path = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name+".jsonl"
-    file_name_answers = "answers_answers"
+    file_name_answers = "answers2_answers"
     file_path_answers = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name_answers+".jsonl"
-    username_extra = "checkin_three_all_labels-"
+    username_extra = "checkin_four_all_labels-"
     all_users = []
 
     def __init__(self):
@@ -74,28 +74,31 @@ class InterannotatorAgreement():
             else:
                 username = ""
             username = username.replace(self.username_extra, "")
+            try:
+                self.create_relationship_dict(entry, username)
+                relations = self.relation_dict[username][text]
 
-            self.create_relationship_dict(entry, username)
-            relations = self.relation_dict[username][text]
+                document_id = entry['document_index']
+                sentence_id = entry['md_sentence_index']
 
-            document_id = entry['document_index']
-            sentence_id = entry['md_sentence_index']
-
-            # removing punctuations from the sentence
-            text = re.sub(r'[^\w\s]', '', text)
-            for index, word in enumerate(text.split(" ")):
-                entity = self.get_extra(entry, word)
+                # removing punctuations from the sentence
             
-                if word in entity:
-                    arr = [username, text, document_id, sentence_id, word, index, "entity"] + entity[word] + entity[word][1:]
-                else:
-                    arr = [username, text, document_id, sentence_id, word, index, "entity"] + ["None", "None", "None", "None", "None"]
-                self.result.append(arr)
+                text = re.sub(r'[^\w\s]', '', text)
+                for index, word in enumerate(text.split(" ")):
+                    entity = self.get_extra(entry, word)
 
-                for r in relations:
-                    if word in r:
-                        arr_rel = [username, text, document_id, sentence_id, word, index, "relationship", r['label']] + r[word]
-                        self.result.append(arr_rel)
+                    if word in entity:
+                        arr = [username, text, document_id, sentence_id, word, index, "entity"] + entity[word] + entity[word][1:]
+                    else:
+                        arr = [username, text, document_id, sentence_id, word, index, "entity"] + ["None", "None", "None", "None", "None"]
+                    self.result.append(arr)
+
+                    for r in relations:
+                        if word in r:
+                            arr_rel = [username, text, document_id, sentence_id, word, index, "relationship", r['label']] + r[word]
+                            self.result.append(arr_rel)
+            except Exception as e:
+                print("exception")
 
     def get_extra(self, entry, word):
         text = entry["text"]
