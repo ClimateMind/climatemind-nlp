@@ -24,7 +24,7 @@ for entry in data:
                     tmp_tuple = (child_span_start, child_span_end, relation["label"])
                     label_arr.append(tmp_tuple)
 
-    label_tup = (text, {"entities": label_arr})
+    label_tup = (str(text), {"entities": label_arr})
     final_sent.append(label_tup)
 
 print(final_sent)

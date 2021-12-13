@@ -3,7 +3,7 @@ import json
 
 file_name = "checkin_four_all_labels"
 file_path = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name+".jsonl"
-user = "answers2"
+user = "JuneChoi"
 data = srsly.read_jsonl(file_path)
 
 
