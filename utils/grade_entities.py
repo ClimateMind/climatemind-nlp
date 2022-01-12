@@ -6,7 +6,7 @@ import sys
 import datetime
 
 file_name = "checkin_four_all_labels"
-file_path = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name+".jsonl"
+file_path = "C:/Users/buchh/OneDrive/Desktop/cm/cm_jsonl/"+file_name+".jsonl"
 
 answer_username = "answers2"
 username_extra = "checkin_four_all_labels-"

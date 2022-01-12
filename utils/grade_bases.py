@@ -5,16 +5,16 @@ import csv
 import sys
 import datetime
 
-file_name = "checkin_three_all_labels"
-file_path = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name+".jsonl"
-file_name_answers = "answers_answers"
-file_path_answers = "C://Users//buchh//OneDrive/Desktop//cm_nlp//climatemind-nlp//utils//"+file_name_answers+".jsonl"
+file_name = "checkin_four_all_labels"
+file_path = "C://Users//buchh//OneDrive/Desktop//cm//cm_jsonl//"+file_name+".jsonl"
+file_name_answers = "answers2_answers"
+file_path_answers = "C://Users//buchh//OneDrive/Desktop//cm//cm_jsonl//"+file_name_answers+".jsonl"
 
 data = srsly.read_jsonl(file_path)
 data_answers = srsly.read_jsonl(file_path_answers)
 
-answer_username = "answers"
-username_extra = "checkin_three_all_labels-"
+answer_username = "answers2"
+username_extra = "checkin_four_all_labels-"
 
 csv_columns_sub = [
     "user",
