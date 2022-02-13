@@ -142,7 +142,7 @@ cython_debug/
 prodigy-*.whl
 ProdigyLicenseKey.txt
 
-# This json contains some of our Azure secrets so becare about comitting it
+# This json contains some of our Azure secrets so beware about committing it!!!
 prodigy.json
 prodigy_testing/
 
