@@ -13,7 +13,7 @@ def main():
 
     output_file_path = args.input_file_path.replace(".csv", ".jsonl", 1)
     randomized_output_file_path = path.join(path.dirname(output_file_path),
-                                            "reversed_" + path.basename(output_file_path)
+                                            "randomized_" + path.basename(output_file_path)
                                             )
     json_data = []
     for index, row in data.iterrows():
@@ -22,6 +22,8 @@ def main():
             for column in columns:
                     if column == "text":
                             row[column] = row[column].replace('\n','')
+                    if pd.isna(row[column]):
+                            row[column] = ""
                     line_contents[column] = row[column]
             json_data.append(line_contents)
 
