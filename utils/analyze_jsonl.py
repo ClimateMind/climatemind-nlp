@@ -7,7 +7,8 @@ import copy
 import csv
 
 #file_path = "entity_checkin_one_download.49863984-3905-4e3d-a059-4b2ef0004267.jsonl" 
-file_name = "entity_checkin_one_download.850cb48f-8027-4380-a497-fc0f31e64f48"
+#file_name = "entity_checkin_one_download.850cb48f-8027-4380-a497-fc0f31e64f48"
+file_name = "database_download/main_3_per_cluster_download.66081fcf-3ef5-48ea-97e0-49298d29b477"
 file_path = file_name + ".jsonl"
 
 data = srsly.read_jsonl(file_path)
@@ -83,28 +84,28 @@ for entry in data:
 	else: throw("NO 'text' field encountered! This field is necessary for the rest of the script to work! Please fix this and then run this script.")
 
 
-	if "original_text" in entry:
-		original_text = entry["orig_text"]
+	if "original_md_text" in entry:
+		original_text = entry["original_md_text"]
 	else: 
 		original_text = "None because no text modifications made. See 'text' field for the original text."
 
 
-	if "source" in entry:
-		source = entry["source"]
+	if "url" in entry:
+		source = entry["url"]
 	else: 
-		source = "source missing!"
+		source = "url missing!"
 
 
-	if "document_id" in entry:
-		document_id = entry["document_id"]
+	if "document_index" in entry:
+		document_id = entry["document_index"]
 	else: 
-		document_id = "document id missing!"
+		document_id = "document index missing!"
 
 
-	if "sentence_id" in entry:
-		sentence_id = entry["sentence_id"]
+	if "md_sentence_index" in entry:
+		sentence_id = entry["md_sentence_index"]
 	else: 
-		sentence_id = "sentence id missing!"
+		sentence_id = "md_sentence_index missing!"
 
 	if "_session_id" in entry:
 		username = entry["_session_id"]
