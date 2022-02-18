@@ -1,0 +1,25 @@
+<h2>Definitions</h2>
+
+<p><strong>base:</strong> base entity. The foundation of a causal 'concept' or an effect 'concept'. e.g. ice, storms, allergies, pollution</p>
+
+<p><strong>type_of:</strong> type of base entity. e.g. continental ice, polar storms, pollen allergies, air pollution</p>
+
+<p><strong>change_direction:</strong> direction of change associated with the base. eg increased, more, decrease, down</p>
+
+<p><strong>aspect_changing:</strong> a measurement (something measurable) or an aspect (or form of existence) that is altered or changing. eg temperatures, population, risk, dilution</p>
+
+<p><strong>to_whom:</strong> the specific groups of people or specific identities (or specific species!) directly affected by the change in the base entity. eg Canadian minority groups, school children, cats, LGBT people</p>
+
+<p><strong>effect_size:</strong> quantitative OR qualitative extent of the aspect_changing. e.g. very, small, 100 pounds, $50 USD, 3%, extreme, every centimetre</p>
+
+<p><strong>confidence:</strong> how certain or uncertain the relationship is. eg is, definitely, already, probably, predicted, may have, hypothesized. Don't annotate uncertain or unknown relationships!</p>
+
+<p><strong>when:</strong> the time period that the specific change in base occurred (during which the specified effect size occurred, if present). eg future, current, in 2020, in the winter, continues, from July to August, the year prior to the test</p>
+
+<p><strong>where:</strong> location(s) where specific instance(s) of the change in the base entity are occurring. Usually correspond to specific events of the base entity changing, like where on Earth the change could occur. eg in New Zealand, in the solar panel factory, on the internet, in the desert</p>
+
+<p><strong>predicate:</strong> links two concepts to indicate a cause-effect relationship. Eg. 'causes', 'triggers'</p>
+
+<h2>More info</h2>
+<p><a href="https://docs.google.com/presentation/d/1fNaEU58jBZamEqqgmbyK2p_SWXtvt-3kq_4FFdweKfY/edit?usp=sharing">Workshop presentation</a></p>
+<p><a href="https://docs.google.com/document/d/1Fqg_NUtcncNKuLS8TGWsiHpUbytpUP_31aiV0ZhrKu4/edit#">Guide to entity annotation</a></p>
