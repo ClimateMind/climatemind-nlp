@@ -1,9 +1,9 @@
+import json
 import srsly
 import csv
-import sys
 import datetime
 import re
-	
+
 class InterannotatorAgreement():
 
     csv_columns_sub = [
@@ -32,6 +32,7 @@ class InterannotatorAgreement():
         self.base_dict = {}
         self.relation_dict = {}
         self.result = []
+        self.errors = []
 
     def create_relationship_dict(self, entry, username):
         text = entry["text"]
@@ -93,8 +94,10 @@ class InterannotatorAgreement():
                                 arr_rel = [username, text, document_id, sentence_id, word, index, "relationship", r['label']] + r[word]
                                 self.result.append(arr_rel)
                 except Exception as e:
+                    self.errors.append(entry)
                     print("exception")
             else:
+                self.errors.append(entry)
                 print("username is none")
 
     def get_extra(self, entry, word):
@@ -127,8 +130,20 @@ class InterannotatorAgreement():
 
         print("Created file: " + output_file_name)
 
+    def generate_err_file(self):
+        now = datetime.datetime.now().strftime("%m-%d-%Y_%H%M%S")
+        output_file_name = self.file_name + '_interannotator_agreement_errors_' + now + '.txt'
+        
+        f = open(output_file_name, "a")
+        for x in self.errors:
+            json_str = json.dumps(x)
+            f.write(json_str+"\n")
+        f.close()
+
+        print("Created error file: " + output_file_name)
 
 if __name__ == "__main__":
     ia = InterannotatorAgreement()
     ia.relationship_dict()
     ia.write_file()
+    ia.generate_err_file()
