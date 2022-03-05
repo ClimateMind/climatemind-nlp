@@ -151,3 +151,6 @@ prodigy_testing/
 
 # locked
 .~lock*
+
+# DS Store
+*DS_Store
