@@ -8,7 +8,7 @@ import csv
 
 #file_path = "entity_checkin_one_download.49863984-3905-4e3d-a059-4b2ef0004267.jsonl" 
 #file_name = "entity_checkin_one_download.850cb48f-8027-4380-a497-fc0f31e64f48"
-file_name = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/main_3_per_cluster_download.cba617d8-a055-4622-97a3-c194a148cbed"
+file_name = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/main_3_per_cluster_outputs/main_3_per_cluster_download.cba617d8-a055-4622-97a3-c194a148cbed"
 file_path = file_name + ".jsonl"
 
 data = srsly.read_jsonl(file_path)
@@ -49,7 +49,8 @@ empty_dict_entry = {
 	"original_text": [],
 	"source": [],
 	"document_id": [],
-	"sentence_id": []
+	"sentence_id": [],
+	"change_direction_id": []
 	}
 
 csv_columns = [
@@ -68,7 +69,8 @@ csv_columns = [
 	"original_text",
 	"source",
 	"document_id",
-	"sentence_id"
+	"sentence_id",
+	"change_direction_id"
 ]	
 
 csv_lines = []
@@ -149,6 +151,10 @@ for entry in data:
 							if head_span_label:
 								if entity_label != base_entity: #ensure base_entity doesn't get added twice
 									base_entity_dict[dict_key][head_span_label].append(entity_label)
+									if head_span_label == "change_direction": #if the label is for change_direction then add special type_of id (includes doc id, sentence id, span start, span stop)
+										type_of_id = document_id+"_"+sentence_id+"_"+str(head_span_start)+"_"+str(head_span_end)
+										base_entity_dict[dict_key]["change_direction_id"].append(type_of_id)
+
 
 	#for each base entry, add its dictionary contents to simple list of lists for easy export as csv line later
 

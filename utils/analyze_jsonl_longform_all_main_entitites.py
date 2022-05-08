@@ -1,14 +1,15 @@
-#analyze jsonl file form cause_effect sentence entity labeling (semantic role labeling)
+#analyze jsonl file form cause_effect sentence entity labeling (semantic role labeling) with longform
 
 #import jsonl file
 import srsly
-#import itertools
+import itertools
 import copy
 import csv
 
+
 #file_path = "entity_checkin_one_download.49863984-3905-4e3d-a059-4b2ef0004267.jsonl" 
 #file_name = "entity_checkin_one_download.850cb48f-8027-4380-a497-fc0f31e64f48"
-file_name = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/main_3_per_cluster_download.cba617d8-a055-4622-97a3-c194a148cbed"
+file_name = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP data/main_3_per_cluster_outputs/main_3_per_cluster_download.cba617d8-a055-4622-97a3-c194a148cbed"
 file_path = file_name + ".jsonl"
 
 data = srsly.read_jsonl(file_path)
@@ -49,7 +50,10 @@ empty_dict_entry = {
 	"original_text": [],
 	"source": [],
 	"document_id": [],
-	"sentence_id": []
+	"sentence_id": [],
+	"change_direction_id": [],
+	"aspect_changing_id": [],
+	"base_id": []
 	}
 
 csv_columns = [
@@ -68,7 +72,10 @@ csv_columns = [
 	"original_text",
 	"source",
 	"document_id",
-	"sentence_id"
+	"sentence_id",
+	"change_direction_id",
+	"aspect_changing_id",
+	"base_id"
 ]	
 
 csv_lines = []
@@ -127,6 +134,7 @@ for entry in data:
 							child_span_end = relation["child_span"]["end"] #assumes "end" is present even though doesn't check for it! And assumes just 1 end. This could be improved by checking first for "end"
 							dict_key = str(child_span_start)+":"+str(child_span_end)
 							base_entity = text[child_span_start:child_span_end]
+							base_id = document_id+"_"+sentence_id+"_"+str(child_span_start)+"_"+str(child_span_end)
 
 							if dict_key not in base_entity_dict.keys(): #add it
 								base_entity_dict[dict_key] = copy.deepcopy(empty_dict_entry)
@@ -137,6 +145,7 @@ for entry in data:
 								base_entity_dict[dict_key]["document_id"].append(document_id)
 								base_entity_dict[dict_key]["sentence_id"].append(sentence_id)
 								base_entity_dict[dict_key]["username"].append(username)
+								base_entity_dict[dict_key]["base_id"].append(base_id)
 
 							
 							#now process that Concept_Members relation's "head" information and add it to it's associated base_entity information in the appropriate value of it's appropriate base_entity_dict key.
@@ -149,18 +158,73 @@ for entry in data:
 							if head_span_label:
 								if entity_label != base_entity: #ensure base_entity doesn't get added twice
 									base_entity_dict[dict_key][head_span_label].append(entity_label)
+									
+									# if head_span_label == "change_direction": #if the label is for change_direction then add special type_of id (includes doc id, sentence id, span start, span stop)
+									# 	change_direction_id = document_id+"_"+sentence_id+"_"+str(head_span_start)+"_"+str(head_span_end)
+									# 	base_entity_dict[dict_key]["change_direction_id"].append(change_direction_id)
+									# if head_span_label == "aspect_changing":
+									# 	aspect_changing_id = document_id+"_"+sentence_id+"_"+str(head_span_start)+"_"+str(head_span_end)
+									# 	base_entity_dict[dict_key]["change_direction_id"].append(aspect_changing_id)
 
-	#for each base entry, add its dictionary contents to simple list of lists for easy export as csv line later
+                                    #if the label is for change_direction or aspect_changing then add special id (includes doc id, sentence id, span start, span stop)
+									if head_span_label in ("change_direction", "aspect_changing"):
+										span_id = document_id+"_"+sentence_id+"_"+str(head_span_start)+"_"+str(head_span_end)
+										base_entity_dict[dict_key][head_span_label+"_id"].append(span_id)
 
-	for base_entity_entry in base_entity_dict: #.keys():
-		csv_line = []
-		for column in csv_columns:
-			csv_line.append(base_entity_dict[base_entity_entry][column])
-		csv_lines.append(csv_line)
+
+
+
+
+
+
+	#for each base entry, add its dictionary contents to simple list of lists for easy export as csv line later... but make the data longform for the combinations of change_direction and aspect_changing
+
+	for base_entity_entry, base_entity_value in base_entity_dict.items(): #.keys():
+
+		expanded_lines = []
+
+		# change_direction = base_entity_value["change_direction"] or [()]
+		# aspect_changing = base_entity_value["aspect_changing"] or [()]
+		if base_entity_value["change_direction"]:
+			change_direction = zip(base_entity_value["change_direction"], base_entity_value["change_direction_id"])
+		else:
+			change_direction = [((),())]
+
+		if base_entity_value["aspect_changing"]:
+			aspect_changing = zip(base_entity_value["aspect_changing"], base_entity_value["aspect_changing_id"])
+		else:
+			aspect_changing = [((),())]		
+
+		combinations = itertools.product(change_direction, aspect_changing)
+		for combination in combinations:
+			new_dictionary = {}
+			for csv_column in csv_columns:
+				new_dictionary[csv_column] = base_entity_value[csv_column]
+
+			new_dictionary["change_direction"] = [combination[0][0]]
+			new_dictionary["change_direction_id"] = [combination[0][1]]
+			new_dictionary["aspect_changing"] = [combination[1][0]]
+			new_dictionary["aspect_changing_id"] = [combination[1][1]]
+
+			if new_dictionary["change_direction"] == [()]:
+				new_dictionary["change_direction"] = []
+			if new_dictionary["aspect_changing"] == [()]:
+				new_dictionary["aspect_changing"] = []
+			if new_dictionary["change_direction_id"] == [()]:
+				new_dictionary["change_direction_id"] = []
+			if new_dictionary["aspect_changing_id"] == [()]:
+				new_dictionary["aspect_changing_id"] = []
+
+
+
+			csv_line = []
+			for column in csv_columns:
+				csv_line.append(new_dictionary[column])
+			csv_lines.append(csv_line)
 
 
 #output the lines in csv_lines
-output_file_name = file_name + '_base_entity_export.csv'
+output_file_name = file_name + '_base_entity_export_longform.csv'
 
 with open(output_file_name, 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
