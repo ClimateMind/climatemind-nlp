@@ -30,8 +30,10 @@ for entry in data:
         if entry['answer'] == "accept":
             if entry['_session_id'] == "main_3_per_cluster-Kameron":
                 ner = []
+                token_sent = []
                 for t in entry["tokens"]:
-                    sentences.append(t["text"])
+                    token_sent.append(t["text"])
+                sentences.append(token_sent)
                 for span in entry['spans']:
                     if ("label" in span) and ("start" in span) and ("end" in span):
                         if span["label"] in ents:
@@ -69,7 +71,7 @@ with open('./{}/train.json'.format(data_folder), 'w') as file:
     for item in train:
         file.write("%s\n" % json.dumps(item))
 
-with open('./{}/test.json'.format(data_folder), 'w') as file:
+with open('./{}/dev.json'.format(data_folder), 'w') as file:
     for item in test:
         file.write("%s\n" % json.dumps(item))
 
