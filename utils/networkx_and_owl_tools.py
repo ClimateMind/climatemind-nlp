@@ -55,8 +55,8 @@ G = nx.MultiDiGraph() #May not be needed and could probably just use DiGraph, bu
 
 #the evidence for existence of entities and relations should be appended also (and if multiple evidences/sources then multiple should be added too)... this can be done later by joining the concepts to the original csv file ('standardized_causal_relations_head_and_child_concepts')
 
-increase_id = 1
-decrease_id = 2
+increase_id = "1"
+decrease_id = "2"
 
 deduplicated_standardized_causal_relations_concepts_simple = deduplicated_standardized_causal_relations_concepts_simple.reset_index()
 
@@ -147,7 +147,7 @@ for index, row in deduplicated_standardized_causal_relations_concepts_simple.ite
     #but before do so check make sure it's not already represented (shouildn't be because all concepts have been deduplicated)
     existing_concept_id = [n for n in G if G.nodes[n]["string"] == head_concept_string]
     if not existing_concept_id:
-        G.add_node(head_concept_id, string=head_concept_string)#, original_text=[original_text], sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
+        G.add_node(head_concept_id, string=head_concept_string, class_type="climate_concept")#, original_text=[original_text], sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
     else:
         head_concept_id = existing_concept_id[0]
 
@@ -157,14 +157,14 @@ for index, row in deduplicated_standardized_causal_relations_concepts_simple.ite
     #check that no node already exists with the head_base... if it does, then use that one instead! (no need to append another identifier to it... really just want single id per node)
     existing_base_id = [n for n in G if G.nodes[n]["string"] == head_base]
     if not existing_base_id:
-        G.add_node(head_base_id, string=head_base)#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
+        G.add_node(head_base_id, string=head_base, class_type="base")#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
         # breakpoint()
     else:
         head_base_id = existing_base_id[0]
 
     existing_full_base_id = [n for n in G if G.nodes[n]["string"] == head_full_base]
     if not existing_full_base_id:
-        G.add_node(head_full_base_id, string=head_full_base)#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
+        G.add_node(head_full_base_id, string=head_full_base, class_type="base")#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
         # breakpoint()
     else:
         head_full_base_id = existing_full_base_id[0]
@@ -172,7 +172,7 @@ for index, row in deduplicated_standardized_causal_relations_concepts_simple.ite
 
     existing_change_direction_id = [n for n in G if G.nodes[n]["string"] == head_change_direction]
     if not existing_change_direction_id:
-        G.add_node(head_change_direction_id, string=head_change_direction)#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
+        G.add_node(head_change_direction_id, string=head_change_direction, class_type="change_direction")#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
         # breakpoint()
     else:
         head_change_direction_id = existing_change_direction_id[0]
@@ -180,7 +180,7 @@ for index, row in deduplicated_standardized_causal_relations_concepts_simple.ite
 
     existing_aspect_changing_id = [n for n in G if G.nodes[n]["string"] == head_aspect_changing]
     if not existing_aspect_changing_id:
-        G.add_node(head_aspect_changing_id, string=head_aspect_changing)#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
+        G.add_node(head_aspect_changing_id, string=head_aspect_changing, class_type="aspect_changing")#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
         # breakpoint()
     else:
         head_aspect_changing_id = existing_aspect_changing_id[0]
@@ -266,7 +266,7 @@ for index, row in deduplicated_standardized_causal_relations_concepts_simple.ite
     #but before do so check make sure it's not already represented (shouildn't be because all concepts have been deduplicated)
     existing_concept_id = [n for n in G if G.nodes[n]["string"] == child_concept_string]
     if not existing_concept_id:
-        G.add_node(child_concept_id, string=child_concept_string)#, original_text=[original_text], sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
+        G.add_node(child_concept_id, string=child_concept_string, class_type="climate_concept")#, original_text=[original_text], sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
     else:
         child_concept_id = existing_concept_id[0]
 
@@ -276,14 +276,14 @@ for index, row in deduplicated_standardized_causal_relations_concepts_simple.ite
     #check that no node already exists with the child_base... if it does, then use that one instead! (no need to append another identifier to it... really just want single id per node)
     existing_base_id = [n for n in G if G.nodes[n]["string"] == child_base]
     if not existing_base_id:
-        G.add_node(child_base_id, string=child_base)#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
+        G.add_node(child_base_id, string=child_base, class_type="base")#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
         # breakpoint()
     else:
         child_base_id = existing_base_id[0]
 
     existing_full_base_id = [n for n in G if G.nodes[n]["string"] == child_full_base]
     if not existing_full_base_id:
-        G.add_node(child_full_base_id, string=child_full_base)#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
+        G.add_node(child_full_base_id, string=child_full_base, class_type="base")#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
         # breakpoint()
     else:
         child_full_base_id = existing_full_base_id[0]
@@ -291,7 +291,7 @@ for index, row in deduplicated_standardized_causal_relations_concepts_simple.ite
 
     existing_change_direction_id = [n for n in G if G.nodes[n]["string"] == child_change_direction]
     if not existing_change_direction_id:
-        G.add_node(child_change_direction_id, string=child_change_direction)#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
+        G.add_node(child_change_direction_id, string=child_change_direction, class_type="change_direction")#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
         # breakpoint()
     else:
         child_change_direction_id = existing_change_direction_id[0]
@@ -299,7 +299,7 @@ for index, row in deduplicated_standardized_causal_relations_concepts_simple.ite
 
     existing_aspect_changing_id = [n for n in G if G.nodes[n]["string"] == child_aspect_changing]
     if not existing_aspect_changing_id:
-        G.add_node(child_aspect_changing_id, string=child_aspect_changing)#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
+        G.add_node(child_aspect_changing_id, string=child_aspect_changing, class_type="aspect_changing")#, original_text=original_text, sentence_source=sentence_source, document_id=document_id, sentence_id=sentence_id)
         # breakpoint()
     else:
         child_aspect_changing_id = existing_aspect_changing_id[0]
@@ -412,11 +412,11 @@ edges_to_draw = [edge for edge in G.edges if edge[2]=="is_a"]
 
 subgraph_to_draw = G.edge_subgraph(edges_to_draw)
 
-nx.draw(subgraph_to_draw)
+# nx.draw(subgraph_to_draw)
 
 #plt.savefig("/Users/kameronr/Documents/personal/climate change outreach/new uploads/networkx_graph_ontology.png")
 
-plt.show()
+# plt.show()
 
 
 
@@ -428,13 +428,134 @@ ontology_path = "/Users/kameronr/Documents/personal/climate change outreach/new 
 onto = get_ontology(ontology_path).load()
 
 
+
+#function that finds all the is_a parents when given a possible is_a child node and a graph to check (fullbase is_a base ) (child is_a parent)
+def get_is_a_parents(single_node, graph):
+    to_check = graph.nodes()
+    #get is_a parents of the single_node
+    #get neighbors
+    neighbors = G.neighbors(single_node)
+    #check which of these neighbors are is_a relation
+    is_a_parent_neighbors = []
+    for neighbor in neighbors:
+        if G.has_edge(single_node, neighbor, "is_a"):
+            is_a_parent_neighbors.append(neighbor)
+    return(is_a_parent_neighbors)
+
+#function that fins all the is_a children when given a possible is_A parent node and a graph to check (fullbase is_a base ) (child is_a parent)
+def get_is_a_children(single_node, graph):
+    #to_check = graph.nodes()
+    neighbors = nx.all_neighbors(graph, single_node)
+    #check which neighbors are is_a edges
+    true_children = []
+    for neighbor in neighbors:
+        if graph.has_edge(neighbor, single_node, "is_a"):
+            true_children.append(neighbor)
+    return(true_children)
+
+#add node to ontology
+def add_node_to_ontology_with_is_a(node_to_add, is_a_node, ontology, nx_graph):
+    #TO DO: check to make sure is_a_node is already in the ontology, else throw an error!
+    #if not ontology[is_a_node]:
+    #    throw()
+    
+    #check if node_to_add is already in ontology
+    node_if_already_in_ontology = ontology[node_to_add]
+    if node_if_already_in_ontology:
+        #capture class information already existing and add to it... 
+        #if not already in the list!
+        parent_nodes = node_if_already_in_ontology.is_a
+        if is_a_node not in parent_nodes: 
+            parent_nodes.append(is_a_node)
+            ontology[node_to_add].is_a = parent_nodes
+    else: 
+        with ontology:
+            if node_to_add != is_a_node:
+                new_class = types.new_class(node_to_add, (ontology[is_a_node],))
+                #add annotation label as node["string"]
+                new_class.label = nx_graph.nodes[node_to_add]['string']
+
+    return(ontology)
+
+
+#'1599844502_base' and '1925045096_full_base' cause problem... trying to append '1599844502_base' to list of nodes
+#that are is_a for '1925045096_full_base'
+
+#add all children of a node (all the subclasses of a node in regards to is_a relations)
+def recursive_add_is_a_to_ontology(node, ontology, graph):
+    #if no child of the node to add then stop
+    children = get_is_a_children(node, graph)
+    if not children:
+        #stop
+        return(ontology)
+    else:
+        #recursively add children
+        for child in children:
+            ontology = add_node_to_ontology_with_is_a(child, node, ontology, graph)
+            ontology = recursive_add_is_a_to_ontology(child, ontology, graph)
+        return(ontology)
+
+#is this best way to implement the recursion? or is it arms length recursion?
+
+
+
+import types
+
+
+#build up the blank owl object to include the bases from the networkx object (have the networkx nodes be classes iin the owl object)
+#add bases first...?
+#then add the full bases...?
+
+#use annotation 'label' to add in the string for each class.  https://owlready2.readthedocs.io/en/latest/annotations.html
+
+#find all the nodes to be classes that don't have any (the top level) and keep track of nodes already done
+#add all networkx nodes that don't have any is_a children
+#for each node in networkx graph add to list if do not have is_a edge relation with another node.
+#only search the base nodes for now
+top_level_classes = []
+for node in G.nodes:
+    is_a_parents = get_is_a_parents(node, G) 
+    if not is_a_parents:
+        #if G.nodes[node]['class_type']=="base":
+        #if it has no is_a relations 
+        top_level_classes.append(node)
+
+
+#add top_level_classes to owl object
+for node in top_level_classes:
+    with onto:
+        new_class = types.new_class(node, (Thing,))
+        #add annotation label as node["string"]
+        new_class.label = G.nodes[node]['string']
+
+        #if the node has child, add them... and when adding each one, first check it doesn't exist then add it. if it does exist be sure to add it again and extend it's is_a relations to include the old and the new!
+        onto = recursive_add_is_a_to_ontology(node, onto, G)
+        pass
+
+
+#export the ontology as an .owl file to import into Protege.
+onto.save(file = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP_ontology_standardized_bases_only.rdfxml", format = "rdfxml")
+
+
+
+#if I run this script 3 times in a row I get a weird error about '1599844502_base' [climate change] not being a Class (so it fails because it's a subclass and not a class so can't get added to '1925045096_full_base' [human-caused_climate_change])... suggests need more error catching and if then else statements to avoid redoing work already done... and if doing work already done then it should catch itself and skip that work
+
+
+#problem with '1599844502_base' and 'Thing'
+#     neighbors=nx.neighbors(G, node)
+
 #list(onto.classes())
 
 
-#load in the base heirarchy into a new networkx object
+#TO DO:
+#add in all the other ontology information into the owl object
+
+#TO DO:
+#load in the modified base heirarchy file and then process it and integrate the information into the old networkx object to form a new updated improved networkx object
 
 
-#there should be different types of networkx node objects. one for classes. one for individuals.
+
+#side note: there should be different types of networkx node objects. one for classes. one for individuals.
 
 
 
