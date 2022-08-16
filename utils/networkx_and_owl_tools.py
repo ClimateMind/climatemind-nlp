@@ -425,8 +425,9 @@ subgraph_to_draw = G.edge_subgraph(edges_to_draw)
 ontology_path = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/NLP ontology with entities_corrected5.owl"
 
 #onto = get_ontology(ontology_path)
-onto = get_ontology(ontology_path).load()
+experimental_onto = get_ontology(ontology_path).load()
 
+onto = get_ontology("Climate_Mind_ontology")
 
 
 #function that finds all the is_a parents when given a possible is_a child node and a graph to check (fullbase is_a base ) (child is_a parent)
@@ -514,11 +515,12 @@ import types
 #only search the base nodes for now
 top_level_classes = []
 for node in G.nodes:
+    #if it has no is_a relations 
     is_a_parents = get_is_a_parents(node, G) 
     if not is_a_parents:
-        #if G.nodes[node]['class_type']=="base":
-        #if it has no is_a relations 
-        top_level_classes.append(node)
+        #if it's a base
+        if G.nodes[node]['class_type']=="base":
+            top_level_classes.append(node)
 
 
 #add top_level_classes to owl object
