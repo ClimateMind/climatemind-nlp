@@ -44,12 +44,12 @@ def add_node_to_ontology_with_is_a(node_to_add, is_a_node, ontology, nx_graph):
     
     #check if node_to_add is already in ontology
     node_if_already_in_ontology = ontology[node_to_add]
-    if node_if_already_in_ontology:
+    if node_if_already_in_ontology: # and ontology[is_a_node] in list(ontology.classes()):
         #capture class information already existing and add to it... 
         #if not already in the list!
         parent_nodes = node_if_already_in_ontology.is_a
         if is_a_node not in parent_nodes: 
-            parent_nodes.append(is_a_node)
+            parent_nodes.append(ontology[is_a_node])
             ontology[node_to_add].is_a = parent_nodes
     else: 
         with ontology:
@@ -859,30 +859,33 @@ edges_to_draw = [edge for edge in G.edges if edge[2]=="contributesTo"]
 
 subgraph_to_draw = G.edge_subgraph(edges_to_draw)
 
-nx.draw(subgraph_to_draw)
+# nx.draw(subgraph_to_draw)
 # plt.savefig("/Users/kameronr/Documents/personal/climate change outreach/new uploads/networkx_graph_ontology_contributes_to.png")
 # plt.show()
 
 # import networkx as nx
-import pylab as plt
+# import pylab as plt
 from networkx.drawing.nx_agraph import graphviz_layout, to_agraph
-import pygraphviz as pgv
+# import pygraphviz as pgv
 
-for (n1, n2, d) in G.edges(data=True):
-    d.clear()
+# for (n1, n2, d) in G.edges(data=True):
+#     d.clear()
 
-breakpoint()
-for (n, d) in G.nodes(data=True):
-    breakpoint()
-    d.clear()
+# for (n, d) in G.nodes(data=True):
+#     d.clear()
+    #del G.nodes[n]['string','class_type']
+
 
 # pos = nx.nx_pydot.graphviz_layout(G, prog="dot")
-A = to_agraph(G)
-
+# A = to_agraph(G)
+A = to_agraph(subgraph_to_draw)
 
 path = '/Users/kameronr/Documents/personal/climate change outreach/new uploads/networkx_graph_ontology_contributes_to_for_graphviz.txt'
 with open(path, 'w') as f:
-    print(A, file=f)
+    print("digraph G {", file=f)
+    for edge in edges_to_draw:
+        print("\""+str(G.nodes[edge[0]]['string'])+"\""+" -> "+"\""+str(G.nodes[edge[1]]['string'])+"\""+";", file=f)
+    print("}", file=f)
 
 # A.layout('dot')
 # A.draw('/Users/kameronr/Documents/personal/climate change outreach/new uploads/networkx_graph_ontology_contributes_to_graphviz_dot.pdf')
@@ -893,18 +896,58 @@ with open(path, 'w') as f:
 # A.layout('sfdp')
 # A.draw('/Users/kameronr/Documents/personal/climate change outreach/new uploads/networkx_graph_ontology_contributes_to_graphviz_sfdp.pdf')
 
-# A.layout('fdp')
-# A.draw('/Users/kameronr/Documents/personal/climate change outreach/new uploads/networkx_graph_ontology_contributes_to_graphviz_fdp.pdf')
+A.layout('fdp')
+A.draw('/Users/kameronr/Documents/personal/climate change outreach/new uploads/networkx_graph_ontology_contributes_to_graphviz_ids_fdp.pdf')
+
+
+#make graph that has correct node names instead of iris
+N = nx.MultiDiGraph()
+for edge in subgraph_to_draw.edges:
+    nodeA = subgraph_to_draw.nodes[edge[0]]['string']
+    nodeB = subgraph_to_draw.nodes[edge[1]]['string']
+    edge_key = edge[2]
+    N.add_edge(nodeA, nodeB, edge_key)
+
+D = to_agraph(N)
+D.layout('fdp')
+D.draw('/Users/kameronr/Documents/personal/climate change outreach/new uploads/networkx_graph_ontology_contributes_to_graphviz_fdp.pdf')
 
 
 
 
 
+#output new networkx object as a new owl file
+
+import types
+onto2 = get_ontology("Climate_Mind_ontology2")
+
+#find all the nodes to be classes that don't have any (the top level) and keep track of nodes already done
+#add all networkx nodes that don't have any is_a children
+#for each node in networkx graph add to list if do not have is_a edge relation with another node.
+#only search the base nodes for now
+top_level_classes2 = []
+for node in G.nodes:
+    #if it has no is_a relations 
+    is_a_parents = get_is_a_parents(node, G) 
+    if not is_a_parents:
+        #if it's a base
+        if G.nodes[node]['class_type']=="climate_concept":
+            top_level_classes2.append(node)
 
 
+#add top_level_classes to owl object
+for node in top_level_classes2:
+    with onto2:
+        new_class = types.new_class(node, (Thing,))
+        #add annotation label as node["string"]
+        new_class.label = G.nodes[node]['string']
+
+        #if the node has child, add them... and when adding each one, first check it doesn't exist then add it. if it does exist be sure to add it again and extend it's is_a relations to include the old and the new!
+        onto2 = recursive_add_is_a_to_ontology(node, onto2, G)
+        pass
 
 
-
+onto2.save(file = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/Climate_Mind_ontology_climate_concepts.owl", format = "rdfxml")
 
 
 
