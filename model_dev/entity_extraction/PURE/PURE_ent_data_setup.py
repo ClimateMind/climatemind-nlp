@@ -58,10 +58,10 @@ for entry in data:
 
 train, test = train_test_split(final_sent_arr, test_size=0.1)
 #val, test = train_test_split(test, test_size=0.5)
-data_folder = "data_ent"
+data_folder = "data_ent1"
 
 #shutil.rmtree(data_folder)
-#os.makedirs(data_folder, exist_ok=True)
+os.makedirs(data_folder, exist_ok=True)
 
 #with open('./{}/dev.json'.format(data_folder), 'w') as file:
 #    for item in val:
