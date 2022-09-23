@@ -561,7 +561,7 @@ for node in top_level_classes:
 
 
 #read in the modified owl file and integrate the changes (both removal and addition) in the is_a relations to the networkx object.
-updated_ontology_path = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/Climate_Mind_ontology_updated.owl"
+updated_ontology_path = "/Users/kameronr/Documents/personal/climate change outreach/new uploads/Climate_Mind_ontology_updated3.owl"
 updated_onto = get_ontology(updated_ontology_path).load()
 
 #For all the nodes in the networkx object that are represented in the updated_onto, strip away all the is_a relations that are shared between the node and any other node that corresponds to any class in the updated_onto.
