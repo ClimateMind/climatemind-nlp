@@ -64,3 +64,7 @@ cc_df_topic <- cc_df %>%
 
 cat('\n Total # of topics:', length(unique(cc_df_topic$topic_tier1)), '\n\n')
 
+
+## save the result
+readr::write_csv(x = cc_df_topic, file = './src/utils/climate_topics/cc_df_topic.csv')
+
